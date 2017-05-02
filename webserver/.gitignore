@@ -1,0 +1,4 @@
+dist/
+.tscache/
+src/*.js
+*.baseDir.ts

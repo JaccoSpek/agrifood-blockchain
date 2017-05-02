@@ -1,0 +1,22 @@
+<div *ngIf="enrolledId">
+  <h3>Welcome {{enrolledId}}</h3>
+
+  <button type="button" class="btn btn-default" (click)="logout()">Logout</button>
+</div>
+<div *ngIf="!enrolledId">
+  <div class="alert" [ngClass]="msg.level" *ngIf="msg">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <h3>Login</h3>
+  <div id="enroll">
+    <div class="form-group">
+      <label for="enrollId">Username</label>
+      <input type="text" class="form-control" id="enrollId" [(ngModel)]="enrollId">
+    </div>
+    <div class="form-group">
+      <label for="enrollSecret">Password</label>
+      <input type="password" class="form-control" id="enrollSecret" [(ngModel)]="enrollSecret">
+    </div>
+    <button type="button" class="btn btn-default" (click)="login(enrollId,enrollSecret)">Login</button>
+  </div>
+</div>

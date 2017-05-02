@@ -1,0 +1,11 @@
+<h3>Chaincode:</h3>
+<div class="alert" [ngClass]="msg.level" *ngIf="msg">
+  <strong>{{msg.text}}</strong>
+</div>
+<div class="form-group">
+  <label for="ccId">ID</label>
+  <input type="text" class="form-control" id="ccId" [(ngModel)]="newCcId">
+</div>
+<p *ngIf="ccId"><strong>Current:</strong>{{ccId}}</p>
+<button type="button" class="btn btn-default" (click)="update()">Update</button>
+<button *ngIf="enrolledId" type="button" class="btn btn-success" (click)="deploy()">Deploy</button>

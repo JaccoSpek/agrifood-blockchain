@@ -1,0 +1,9 @@
+node_modules/
+tmp/
+vendor/
+.idea/
+app/src/.baseDir.js
+app/src/routes/api-test.js
+app/src/routes/index.js
+app/src/routes/route.js
+app/src/server.js
