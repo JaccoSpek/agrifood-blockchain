@@ -76,6 +76,7 @@ func (t *AgrifoodChaincode) Init(stub shim.ChaincodeStubInterface, function stri
 
 	// Initiate empty array for AdminCerts
 	err := stub.PutState("AdminCerts", []byte("[]"))
+	err = stub.PutState("SigningCertificates", []byte("[]"))
 
 	if err != nil {
 		msg := fmt.Sprintf("Failed initializing variables: %s", err)
@@ -107,6 +108,10 @@ func (t *AgrifoodChaincode) Invoke(stub shim.ChaincodeStubInterface, function st
 		return t.add_admin(stub, args)
 	} else if function == "add_party" {
 		return t.add_party(stub, args)
+	} else if function == "add_cert" {
+		return t.add_cert(stub, args)
+	} else if function == "add_signing_certificate" {
+		return t.add_signing_certificate(stub, args)
 	}
 
 	myLogger.Errorf("Received unknown function invocation: %s", function)
@@ -265,6 +270,94 @@ func (t *AgrifoodChaincode) add_cert(stub shim.ChaincodeStubInterface, args []st
 	return []byte("Successfully saved party"), nil
 }
 
+// add signing certificate
+func (t *AgrifoodChaincode) add_signing_certificate(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// can only be called by AccreditationBody
+	myLogger.Info("Register new signing certificate")
+
+	party, err := t.getCallerParty(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error determining party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Debugf("Received party: %s, role:%s", party.Id, party.Role)
+
+	// check if caller is a shipping line
+	if party.Role != t.roles[0] {
+		msg := "Caller is not an AccreditationBody"
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// Check number of arguments
+	if len(args) != 3 {
+		msg := "Incorrect number of arguments. Expecting 3" // ID, description,
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	signingCert := SigningCertificate{ID:args[0],Description:args[1]}
+	signingCert.Created, err = time.Parse(time.RFC3339,args[2])
+	if err != nil {
+		msg := "Error parsing time"
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// save certificate
+	err = t.saveSigningCert(stub,signingCert,true)
+	if err != nil {
+		msg := fmt.Sprintf("Error saving signing certificate: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Info("New signing certificate added")
+
+	return []byte("New signing certificate added"), nil
+}
+
+// save signing certificate to world-state
+func (t *AgrifoodChaincode) saveSigningCert(stub shim.ChaincodeStubInterface, signingCert SigningCertificate, new bool) error {
+	signing_certs, err := t.getSigningCerts(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving signing certs: %s", err)
+		myLogger.Error(msg)
+		return errors.New(msg)
+	}
+
+	if !new { //update
+		// set new vessel state
+		for i, v := range signing_certs {
+			if v.ID == signingCert.ID {
+				signing_certs[i] = signingCert
+			}
+		}
+	} else { // save new
+		signing_certs = append(signing_certs, signingCert)
+	}
+
+	// serialize certs
+	signing_certs_b, err := json.Marshal(signing_certs)
+	if err != nil {
+		msg := "Error marshalling signing_certs"
+		myLogger.Error(msg)
+		return errors.New(msg)
+	}
+
+	// save serialized vessels
+	err = stub.PutState("SigningCertificates", signing_certs_b)
+	if err != nil {
+		msg := "Error saving SigningCertificates"
+		myLogger.Error(msg)
+		return errors.New(msg)
+	}
+
+	return nil
+}
+
 // save party to world-state
 func (t *AgrifoodChaincode) saveParty(stub shim.ChaincodeStubInterface, party Party, new bool) error {
 	parties, err := t.getParties(stub)
@@ -345,10 +438,30 @@ Query section
 func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	myLogger.Debug("Query Chaincode...")
 
-	// handle diferent functions
+	// handle different functions
 
 	myLogger.Errorf("Received unknown query function: %s", function)
 	return nil, errors.New("Received unknown query function")
+}
+
+func (t *AgrifoodChaincode) getSigningCerts(stub shim.ChaincodeStubInterface) ([]SigningCertificate, error) {
+	// get certificates
+	signing_certs_b, err := stub.GetState("SigningCertificates")
+	if err != nil {
+		msg := fmt.Sprintf("Error getting signing certificates from storage: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	var signing_certs []SigningCertificate
+	err = json.Unmarshal(signing_certs_b, &signing_certs)
+	if err != nil {
+		msg := "Error parsing signing certificates"
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	return signing_certs, nil
 }
 
 // get caller party object
