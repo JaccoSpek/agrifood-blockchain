@@ -22,6 +22,7 @@ type Party struct {
 type SigningAuthorization struct {
 	AuthorizedParty 	string
 	CertificateID		string
+	Expires			time.Time
 	Revoked			bool
 	RevocationTimestamp	time.Time
 }
@@ -33,6 +34,7 @@ type SigningCertificate struct {
 	AccreditationBody	string
 	CertificationBody	string
 	Created			time.Time
+	Expires			time.Time
 	Revoked			bool
 	RevocationTimestamp	time.Time
 }
@@ -47,7 +49,7 @@ type CertificateSignature struct {
 }
 
 // Entity in provenance chain
-type ProvenanceEntity struct {
+type ProvenanceEntry struct {
 	PartyID		string
 	Timestamp	time.Time
 }
@@ -58,7 +60,7 @@ type GrapesUnit struct {
 	Created			time.Time
 	UUID			string
 	CertificateSignatures	[]CertificateSignature
-	Provenance		[]ProvenanceEntity
+	Provenance		[]ProvenanceEntry
 }
 
 // Smart-contract
@@ -298,7 +300,7 @@ func (t *AgrifoodChaincode) add_signing_certificate(stub shim.ChaincodeStubInter
 
 	myLogger.Debugf("Received party: %s, role:%s", party.ID, party.Role)
 
-	// check if caller is a shipping line
+	// check if caller is a AccreditationBody
 	if party.Role != t.roles[0] {
 		msg := "Caller is not an AccreditationBody"
 		myLogger.Error(msg)
@@ -306,8 +308,8 @@ func (t *AgrifoodChaincode) add_signing_certificate(stub shim.ChaincodeStubInter
 	}
 
 	// Check number of arguments
-	if len(args) != 3 {
-		msg := "Incorrect number of arguments. Expecting 3" // ID, description,
+	if len(args) != 4 {
+		msg := "Incorrect number of arguments. Expecting 4" // ID, description,created,expiration date
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -315,7 +317,14 @@ func (t *AgrifoodChaincode) add_signing_certificate(stub shim.ChaincodeStubInter
 	signingCert := SigningCertificate{ID:args[0],Description:args[1],Revoked:false}
 	signingCert.Created, err = time.Parse(time.RFC3339,args[2])
 	if err != nil {
-		msg := "Error parsing time"
+		msg := "Error parsing time (created date)"
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	signingCert.Expires, err = time.Parse(time.RFC3339,args[3])
+	if err != nil {
+		msg := "Error parsing time (expiration date)"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -347,7 +356,7 @@ func (t *AgrifoodChaincode) issue_signing_certificate(stub shim.ChaincodeStubInt
 
 	myLogger.Debugf("Received party: %s, role:%s", party.ID, party.Role)
 
-	// check if caller is a shipping line
+	// check if caller is a AccreditationBody
 	if party.Role != t.roles[0] {
 		msg := "Caller is not an AccreditationBody"
 		myLogger.Error(msg)
@@ -365,6 +374,13 @@ func (t *AgrifoodChaincode) issue_signing_certificate(stub shim.ChaincodeStubInt
 	certificate, err := t.getSigningCert(stub,args[0])
 	if err != nil {
 		msg := fmt.Sprintf("Error determining certificate: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// see if certificate is still valid
+	if certificate.Expires.Before(time.Now()) {
+		msg := "Error: Certificate expired"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -420,8 +436,8 @@ func (t *AgrifoodChaincode) revoke_signing_certificate(stub shim.ChaincodeStubIn
 
 	myLogger.Debugf("Received party: %s, role:%s", party.ID, party.Role)
 
-	// check if caller is a shipping line
-	if party.Role != t.roles[0] {
+	// check if caller is a AccreditationBody or auditor
+	if party.Role != t.roles[0] || party.Role != t.roles[3] {
 		msg := "Caller is not an AccreditationBody"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
@@ -443,7 +459,7 @@ func (t *AgrifoodChaincode) revoke_signing_certificate(stub shim.ChaincodeStubIn
 	}
 
 	// verify if accreditation body is owner of certificate
-	if certificate.AccreditationBody != party.ID {
+	if party.Role == t.roles[0] && certificate.AccreditationBody != party.ID {
 		msg := fmt.Sprintf("Error: Accreditation body (%s) is not the issuer of this certificate (%s)",party.ID,certificate.ID)
 		myLogger.Warning(msg)
 		return nil, errors.New(msg)
@@ -485,7 +501,7 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 
 	myLogger.Debugf("Received party: %s, role:%s", party.ID, party.Role)
 
-	// check if caller is a shipping line
+	// check if caller is a AccreditationBody
 	if party.Role != t.roles[1] {
 		msg := "Caller is not a CertificationBody"
 		myLogger.Error(msg)
@@ -493,8 +509,8 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 	}
 
 	// Check number of arguments
-	if len(args) != 2 {
-		msg := "Incorrect number of arguments. Expecting 2" // CertificateID, authorized partyID
+	if len(args) != 3 {
+		msg := "Incorrect number of arguments. Expecting 3" // CertificateID, authorized partyID, Expiration timestamp
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -503,6 +519,13 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 	certificate, err := t.getSigningCert(stub,args[0])
 	if err != nil {
 		msg := fmt.Sprintf("Error determining certificate: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// see if certificate is still valid
+	if certificate.Expires.Before(time.Now()) {
+		msg := "Error: Certificate expired"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -524,6 +547,13 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 
 	// create and save signing authorization
 	signingAuthorization := SigningAuthorization{AuthorizedParty:authorizedParty.ID,CertificateID:certificate.ID,Revoked:false}
+	signingAuthorization.Expires, err = time.Parse(time.RFC3339,args[2])
+	if err != nil {
+		msg := "Error parsing time (expiration date)"
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
 	err = t.saveSigningAuthorization(stub,signingAuthorization,false)
 	if err != nil {
 		msg := fmt.Sprintf("Error saving signing authorization: %s", err)
@@ -550,9 +580,9 @@ func (t *AgrifoodChaincode) revoke_signing_authority(stub shim.ChaincodeStubInte
 
 	myLogger.Debugf("Received party: %s, role:%s", party.ID, party.Role)
 
-	// check if caller is a shipping line
-	if party.Role != t.roles[1] {
-		msg := "Caller is not a CertificationBody"
+	// check if caller is a Certification Body or Auditor
+	if party.Role != t.roles[1] && party.Role != t.roles[3] {
+		msg := "Caller is not a CertificationBody or Auditor"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -573,7 +603,7 @@ func (t *AgrifoodChaincode) revoke_signing_authority(stub shim.ChaincodeStubInte
 	}
 
 	// verify access rights
-	if certificate.CertificationBody != party.ID {
+	if party.Role != t.roles[1] && certificate.CertificationBody != party.ID {
 		msg := fmt.Sprintf("Party %s is not the certification body of %s", party.ID, certificate.ID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
@@ -639,7 +669,7 @@ func (t *AgrifoodChaincode) create_grapes(stub shim.ChaincodeStubInterface, args
 
 	// Check number of arguments
 	if len(args) != 2 {
-		msg := "Incorrect number of arguments. Expecting 2" // UUID, created,
+		msg := "Incorrect number of arguments. Expecting 2" // UUID, created
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -652,6 +682,11 @@ func (t *AgrifoodChaincode) create_grapes(stub shim.ChaincodeStubInterface, args
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
+
+	// Add to provenance chain
+	provEntry := ProvenanceEntry{PartyID:party.ID,Timestamp:grapesUnit.Created}
+	// initiate array
+	grapesUnit.Provenance = append(grapesUnit.Provenance,provEntry)
 
 	// save grape unit
 	err = t.saveGrapeUnit(stub,grapesUnit,true)
@@ -724,6 +759,13 @@ func (t *AgrifoodChaincode) certify_grapes(stub shim.ChaincodeStubInterface, arg
 		return nil, errors.New(msg)
 	}
 
+	// check expiration date
+	if signAuth.Expires.Before(time.Now()){
+		msg := fmt.Sprintf("Signing authority for %s by %s has expired",signAuth.CertificateID,party.ID)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
 	// get certificate
 	certificate, err := t.getSigningCert(stub,signAuth.CertificateID)
 	if err != nil {
@@ -735,6 +777,13 @@ func (t *AgrifoodChaincode) certify_grapes(stub shim.ChaincodeStubInterface, arg
 	// see if certificate is valid
 	if certificate.Revoked {
 		msg := fmt.Sprintf("Invalid signing certificate: %s",certificate.ID)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// check expiration date
+	if certificate.Expires.Before(time.Now()){
+		msg := fmt.Sprintf("Certificate %s has expired",signAuth.CertificateID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -762,6 +811,165 @@ func (t *AgrifoodChaincode) certify_grapes(stub shim.ChaincodeStubInterface, arg
 	}
 
 	msg := fmt.Sprintf("Successfully signed signature for grapes: %s",grapesUnit.UUID)
+	myLogger.Info(msg)
+	return []byte(msg),nil
+}
+
+// revoke signature on grape units
+func (t *AgrifoodChaincode) revoke_signature(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// can only be called by Auditors and Farms that issued the signature
+	myLogger.Info("Revoke signature on grapes unit")
+
+	party, err := t.getCallerParty(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error determining party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Debugf("Received party: %s, role:%s", party.ID, party.Role)
+
+	// check if caller is a Farm or Auditor
+	if party.Role != t.roles[2] && party.Role != t.roles[3] {
+		msg := "Caller is not a Farm or Auditor"
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// Check number of arguments
+	if len(args) != 3 {
+		msg := "Incorrect number of arguments. Expecting 3" // UUID, certificateID, revokeTimestamp
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// get grape unit from storage
+	grapeUnit, err := t.getGrapesUnit(stub,args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error determining grapeUnit: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// if caller is farm, check if it's the producer of the grapes
+	if party.Role == t.roles[2] && grapeUnit.Producer != party.ID {
+		msg := fmt.Sprintf("Farm is not producer of targeted grapes: %s", grapeUnit.UUID)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// loop over signatures
+	for i, signature := range grapeUnit.CertificateSignatures {
+		// find correct signature
+		if signature.CertificateID == args[2] {
+			// revoke signature
+			signature.Revoked = true
+			signature.RevocationTimestamp, err = time.Parse(time.RFC3339,args[3])
+			if err != nil {
+				msg := "Error parsing time"
+				myLogger.Error(msg)
+				return nil, errors.New(msg)
+			}
+
+			// update signature
+			grapeUnit.CertificateSignatures[i] = signature
+		}
+	}
+
+	// save to world-state
+	err = t.saveGrapeUnit(stub,grapeUnit,false)
+	if err != nil {
+		msg := fmt.Sprintf("Error saving updated grapeUnit: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// done
+	msg := fmt.Sprintf("Successfully revoked signature of %s for grapes: %s",args[2],grapeUnit.UUID)
+	myLogger.Info(msg)
+	return []byte(msg),nil
+}
+
+// transfer grapes to new owner (trader)
+func (t *AgrifoodChaincode) transfer_grapes(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// can only be called by farms and traders
+	myLogger.Info("Transfer ownership of grapes")
+
+	party, err := t.getCallerParty(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error determining party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Debugf("Received party: %s, role:%s", party.ID, party.Role)
+
+	// check if caller is a Farm or Trader
+	if party.Role != t.roles[2] && party.Role != t.roles[4] {
+		msg := "Caller is not a Farm or Trader"
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// Check number of arguments
+	if len(args) != 3 {
+		msg := "Incorrect number of arguments. Expecting 3" // UUID, newParty, timestamp
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// get grapesUnit
+	grapesUnit, err := t.getGrapesUnit(stub,args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error determining grapesUnit: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// verify caller is current owner of grapes
+	if grapesUnit.Provenance[len(grapesUnit.Provenance)-1].PartyID != party.ID {
+		msg := fmt.Sprintf("Caller is not the current owner of the grapes: %s", grapesUnit.UUID)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// get newParty
+	newParty, err := t.getParty(stub, args[1])
+	if err != nil {
+		msg := fmt.Sprintf("Error determining new party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// create new provenance entry
+	provEntry := ProvenanceEntry{PartyID:newParty.ID}
+	provEntry.Timestamp, err = time.Parse(time.RFC3339,args[2])
+	if err != nil {
+		msg := fmt.Sprintf("Error parsing timestamp: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// verify provenance entry timestamp is after last provenance entry timestamp
+	if grapesUnit.Provenance[len(grapesUnit.Provenance)-1].Timestamp.After(provEntry.Timestamp) {
+		msg := "new provenance timestamp needs to be after latest provenance entry timestamp"
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// append provenance entry
+	grapesUnit.Provenance = append(grapesUnit.Provenance,provEntry)
+
+	// save to world-state
+	err = t.saveGrapeUnit(stub,grapesUnit,false)
+	if err != nil {
+		msg := fmt.Sprintf("Error saving updated grapeUnit: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// done
+	msg := fmt.Sprintf("Successfully transferred grapes %s from %s to: %s",grapesUnit.UUID,party.ID,provEntry.PartyID)
 	myLogger.Info(msg)
 	return []byte(msg),nil
 }
