@@ -80,7 +80,6 @@ func (t *AgrifoodChaincode) Init(stub shim.ChaincodeStubInterface, function stri
 	err = stub.PutState("SigningCertificates", []byte("[]"))
 	err = stub.PutState("SigningAuthorizations", []byte("[]"))
 	err = stub.PutState("GrapeUnits", []byte("[]"))
-	err = stub.PutState("CertificateSignatures", []byte("[]"))
 
 	if err != nil {
 		msg := fmt.Sprintf("Failed initializing variables: %s", err)
@@ -1207,11 +1206,129 @@ Query section
 func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	myLogger.Debug("Query Chaincode...")
 
-	// handle different functions
+	// Handle different functions
+	if function == "grape_provenance" {
+		return t.grape_provenance(stub, args)
+	} else if function == "grape_certification" {
+		return t.grape_certification(stub, args)
+	} else if function == "signer_certs" {
+		return t.signer_certs(stub, args)
+	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
 	return nil, errors.New("Received unknown query function")
 }
+
+// return grape provenance
+func (t *AgrifoodChaincode) grape_provenance(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// public query function to check provenance of grapes
+	myLogger.Info("Get provenance of grapes..")
+
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 3" // UUID
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// get grapesUnit
+	grapesUnit, err := t.getGrapesUnit(stub,args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error determining grapesUnit: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// serialize provenance of grapes
+	grapes_provenance_b, err := json.Marshal(grapesUnit.Provenance)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling grapes provenance: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Info("Return provenance")
+	return grapes_provenance_b, nil
+}
+
+// return grape certification
+func (t *AgrifoodChaincode) grape_certification(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// public query function to check certification of grapes
+	myLogger.Info("Get certification of grapes..")
+
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 1" // UUID
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// get grapesUnit
+	grapesUnit, err := t.getGrapesUnit(stub,args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error determining grapesUnit: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// serialize certificates
+	grapes_certificates_b, err := json.Marshal(grapesUnit.CertificateSignatures[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling grapes certificates: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Info("Return certificates")
+	return grapes_certificates_b,nil
+}
+
+// return signing authorizations of party for certificate
+func (t *AgrifoodChaincode) signer_certs(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// public query function to return signing authorizations of a farm
+	myLogger.Info("Get signing authorizations of a farm..")
+
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 1" // farmID
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	// get party
+	party, err := t.getParty(stub, args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error determining party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+
+	all_auths, err := t.getSigningAuthorizations(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error determining grapesUnit: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	var party_auths []SigningAuthorization
+	for _,auth := range all_auths {
+		if auth.AuthorizedParty == party.ID {
+			party_auths = append(party_auths,auth)
+		}
+	}
+
+	party_auths_b, err := json.Marshal(party_auths)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling party authorizations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	return party_auths_b, nil
+}
+
+
 
 // get specific grape unit
 func (t *AgrifoodChaincode) getGrapesUnit(stub shim.ChaincodeStubInterface, uuid string) (GrapesUnit, error) {
