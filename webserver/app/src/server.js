@@ -12,14 +12,12 @@ var methodOverride = require("method-override");
 var enroll_routes_1 = require("./routes/enroll-routes");
 var chaincode_routes_1 = require("./routes/chaincode-routes");
 var admin_routes_1 = require("./routes/admin-routes");
-var party_routes_1 = require("./routes/party-routes");
-var shippingline_routes_1 = require("./routes/shippingline-routes");
-var stevedore_routes_1 = require("./routes/stevedore-routes");
-var forwarder_routes_1 = require("./routes/forwarder-routes");
-var bank_routes_1 = require("./routes/bank-routes");
-var carrier_routes_1 = require("./routes/carrier-routes");
-var customs_routes_1 = require("./routes/customs-routes");
-var consignee_routes_1 = require("./routes/consignee-routes");
+var ab_routes_1 = require("./routes/ab-routes");
+var cb_routes_1 = require("./routes/cb-routes");
+var farm_routes_1 = require("./routes/farm-routes");
+var auditor_routes_1 = require("./routes/auditor-routes");
+var trader_routes_1 = require("./routes/trader-routes");
+var public_routes_1 = require("./routes/public-routes");
 var Server = (function () {
     function Server() {
         // create expressjs application
@@ -85,22 +83,18 @@ var Server = (function () {
         ccRoutes.create();
         var adminRoutes = new admin_routes_1.AdminRoutes(router, this.chain);
         adminRoutes.create();
-        var partyRoutes = new party_routes_1.PartyRoutes(router, this.chain);
-        partyRoutes.create();
-        var shippinglineRoutes = new shippingline_routes_1.ShippinglineRoutes(router, this.chain);
-        shippinglineRoutes.create();
-        var stevedoreRoutes = new stevedore_routes_1.StevedoreRoutes(router, this.chain);
-        stevedoreRoutes.create();
-        var forwarderRoutes = new forwarder_routes_1.ForwarderRoutes(router, this.chain);
-        forwarderRoutes.create();
-        var bankRoutes = new bank_routes_1.BankRoutes(router, this.chain);
-        bankRoutes.create();
-        var carrierRoutes = new carrier_routes_1.CarrierRoutes(router, this.chain);
-        carrierRoutes.create();
-        var customsRoutes = new customs_routes_1.CustomsRoutes(router, this.chain);
-        customsRoutes.create();
-        var consigneeRoutes = new consignee_routes_1.ConsigneeRoutes(router, this.chain);
-        consigneeRoutes.create();
+        var abRoutes = new ab_routes_1.ABRoutes(router, this.chain);
+        abRoutes.create();
+        var cbRoutes = new cb_routes_1.CBRoutes(router, this.chain);
+        cbRoutes.create();
+        var farmRoutes = new farm_routes_1.FarmRoutes(router, this.chain);
+        farmRoutes.create();
+        var auditorRoutes = new auditor_routes_1.AuditorRoutes(router, this.chain);
+        auditorRoutes.create();
+        var traderRoutes = new trader_routes_1.TraderRoutes(router, this.chain);
+        traderRoutes.create();
+        var publicRoutes = new public_routes_1.PublicRoutes(router, this.chain);
+        publicRoutes.create();
         // Router middleware
         this.app.use(router);
     };

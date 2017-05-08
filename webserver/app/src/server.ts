@@ -12,6 +12,13 @@ import methodOverride = require("method-override");
 
 import { EnrollRoutes } from "./routes/enroll-routes";
 import { ChaincodeRoutes } from "./routes/chaincode-routes";
+import { AdminRoutes } from "./routes/admin-routes";
+import { ABRoutes } from "./routes/ab-routes";
+import { CBRoutes } from "./routes/cb-routes";
+import { FarmRoutes } from "./routes/farm-routes";
+import { AuditorRoutes } from "./routes/auditor-routes";
+import { TraderRoutes } from "./routes/trader-routes";
+import { PublicRoutes } from "./routes/public-routes";
 
 export class Server {
     protected chain:Chain;
@@ -99,6 +106,27 @@ export class Server {
 
         let ccRoutes = new ChaincodeRoutes(router,this.chain);
         ccRoutes.create();
+
+        let adminRoutes = new AdminRoutes(router, this.chain);
+        adminRoutes.create();
+
+        let abRoutes = new ABRoutes(router, this.chain);
+        abRoutes.create();
+
+        let cbRoutes = new CBRoutes(router, this.chain);
+        cbRoutes.create();
+
+        let farmRoutes = new FarmRoutes(router, this.chain);
+        farmRoutes.create();
+
+        let auditorRoutes = new AuditorRoutes(router, this.chain);
+        auditorRoutes.create();
+
+        let traderRoutes = new TraderRoutes(router, this.chain);
+        traderRoutes.create();
+
+        let publicRoutes = new PublicRoutes(router, this.chain);
+        publicRoutes.create();
 
         // Router middleware
         this.app.use(router);

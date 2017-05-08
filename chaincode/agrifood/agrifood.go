@@ -77,6 +77,7 @@ func (t *AgrifoodChaincode) Init(stub shim.ChaincodeStubInterface, function stri
 
 	// Initiate empty arrays
 	err := stub.PutState("AdminCerts", []byte("[]"))
+	err = stub.PutState("Parties", []byte("[]"))
 	err = stub.PutState("SigningCertificates", []byte("[]"))
 	err = stub.PutState("SigningAuthorizations", []byte("[]"))
 	err = stub.PutState("GrapeUnits", []byte("[]"))
@@ -423,7 +424,7 @@ func (t *AgrifoodChaincode) issue_signing_certificate(stub shim.ChaincodeStubInt
 
 // revoke signing certificate
 func (t *AgrifoodChaincode) revoke_signing_certificate(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	// can only be called by AccreditationBody
+	// can only be called by AccreditationBody or auditor
 	myLogger.Info("Revoke signing certificate")
 
 	party, err := t.getCallerParty(stub)
@@ -567,7 +568,7 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 
 // revoke signing authority
 func (t *AgrifoodChaincode) revoke_signing_authority(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	// can only be called by Certification Body
+	// can only be called by Certification Body or auditor
 	myLogger.Info("Revoke sigining authority of party")
 
 	party, err := t.getCallerParty(stub)
@@ -1155,7 +1156,7 @@ func (t *AgrifoodChaincode) saveParty(stub shim.ChaincodeStubInterface, party Pa
 	}
 
 	// save serialized parties
-	err = stub.PutState("parties", parties_b)
+	err = stub.PutState("Parties", parties_b)
 	if err != nil {
 		msg := "Error saving parties"
 		myLogger.Error(msg)
@@ -1328,8 +1329,6 @@ func (t *AgrifoodChaincode) signer_certs(stub shim.ChaincodeStubInterface, args 
 	return party_auths_b, nil
 }
 
-
-
 // get specific grape unit
 func (t *AgrifoodChaincode) getGrapesUnit(stub shim.ChaincodeStubInterface, uuid string) (GrapesUnit, error) {
 	grapes, err := t.getGrapes(stub)
@@ -1495,7 +1494,7 @@ func (t *AgrifoodChaincode) getParty(stub shim.ChaincodeStubInterface, partyID s
 // get all parties
 func (t *AgrifoodChaincode) getParties(stub shim.ChaincodeStubInterface) ([]Party, error) {
 	// get parties
-	parties_b, err := stub.GetState("parties")
+	parties_b, err := stub.GetState("Parties")
 	if err != nil {
 		msg := fmt.Sprintf("Error getting parties from storage: %s", err)
 		myLogger.Error(msg)
