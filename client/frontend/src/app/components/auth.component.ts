@@ -1,6 +1,7 @@
 import { Component, OnInit }    from '@angular/core';
+import { Observable }         from 'rxjs/Rx';
 
-import { Message } from '../types';
+import { Message,CcRole } from '../types';
 
 import { SharedService } from '../services/shared.service';
 import { ChainService }   from '../services/chain.service';
@@ -13,8 +14,22 @@ import { ChainService }   from '../services/chain.service';
 export class AuthComponent implements OnInit {
   enrolledId:string;
   msg:Message;
+  role:CcRole;
 
   constructor(private sharedService:SharedService, private chainService:ChainService) {};
+
+  getRole():void {
+    let ccID:string = this.sharedService.getValue("chaincodeID");
+    if(this.enrolledId && ccID){
+      if(!this.role){
+        this.chainService.get_caller_role().then(result => {
+          this.role = result;
+          console.log("User role:",this.role);
+          this.sharedService.setKey("role",JSON.stringify(this.role));
+        });
+      }
+    }
+  }
 
   ngOnInit(): void {
     this.chainService.get_enrollment().then(result => {
@@ -22,6 +37,9 @@ export class AuthComponent implements OnInit {
         console.log("Logged in as:",result);
         this.enrolledId = result;
         this.sharedService.setKey("enrolledId",result);
+
+        let timer = Observable.timer(0,1000);
+        timer.subscribe(t => this.getRole());
       } else {
         console.log("Currently not enrolled.");
       }

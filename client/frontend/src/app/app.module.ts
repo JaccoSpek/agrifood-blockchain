@@ -10,13 +10,15 @@ import { AppRoutingModule } from './modules/app-routing.module';
 
 import { AuthComponent } from './components/auth.component';
 import { ChaincodeIdComponent } from './components/chaincode-id.component';
+import { AdminComponent } from './components/admin.component';
 
 @NgModule({
   imports:      [ BrowserModule, HttpModule, FormsModule, AppRoutingModule ],
   declarations: [
     AppComponent,
     AuthComponent,
-    ChaincodeIdComponent
+    ChaincodeIdComponent,
+    AdminComponent
   ],
   providers:    [ SharedService, ChainService ],
   bootstrap:    [ AppComponent ]

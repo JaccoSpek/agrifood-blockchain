@@ -22,6 +22,10 @@ export class PublicRoutes extends BaseChainRoute {
             this.signer_certs(req,res);
         });
 
+        // get caller role
+        this.router.get("/role", (req:Request, res:Response) => {
+            this.get_caller_role(req,res);
+        });
 
     }
 
@@ -73,6 +77,26 @@ export class PublicRoutes extends BaseChainRoute {
             } else {
                 let args = [req.params['party']];
                 this.queryChaincode(ccID,"signer_certs",args,user,tcert,(err:Error, result:any)=>{
+                    if(err) {
+                        console.log("Error: %s",err.message);
+                        res.status(400).send(err.message);
+                    } else {
+                        console.log("Queried results: %s", result);
+                        res.type('json').send(result);
+                    }
+                });
+            }
+        });
+    }
+
+    private get_caller_role(req:Request, res:Response):void {
+        this.verifyQueryRequest(req,[],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+            if(err){
+                console.log("Error: %s",err.message);
+                res.status(400).send(err.message);
+            } else {
+                let args = [];
+                this.queryChaincode(ccID,"get_caller_role",args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message);

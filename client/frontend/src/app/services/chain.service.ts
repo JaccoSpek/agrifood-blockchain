@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Headers, Http, RequestOptions} from '@angular/http';
-
+import { CcRole } from '../types';
 import 'rxjs/add/operator/toPromise';
 
 @Injectable()
@@ -66,6 +66,15 @@ export class ChainService {
       .toPromise()
       .then(response => response.text() as string)
       .catch(ChainService.handleError);
+  }
+
+  get_caller_role(): Promise<CcRole> {
+    let url = `${this.apiURL}/role`;
+
+    return this.http.get(url, this.opts)
+      .toPromise()
+      .then(response => response.json() as CcRole)
+      .catch(ChainService.handleError)
   }
 
   private static handleError(error: any): Promise<any> {

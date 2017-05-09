@@ -12,6 +12,11 @@ import (
 
 var myLogger = shim.NewLogger("Agrifood")
 
+type CallerRole struct {
+	Admin bool
+	Role string
+}
+
 type Party struct {
 	ID    string   // identifier of party
 	Role  string   // role of the party
@@ -1208,9 +1213,11 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 	myLogger.Debug("Query Chaincode...")
 
 	// Handle different functions
-	if function == "grape_provenance" {
-		return t.grape_provenance(stub, args)
+	if function == "get_caller_role" {
+		return t.get_caller_role(stub)
 	} else if function == "grape_certification" {
+		return t.grape_certification(stub, args)
+	}  else if function == "grape_certification" {
 		return t.grape_certification(stub, args)
 	} else if function == "signer_certs" {
 		return t.signer_certs(stub, args)
@@ -1218,6 +1225,36 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 
 	myLogger.Errorf("Received unknown query function: %s", function)
 	return nil, errors.New("Received unknown query function")
+}
+
+// return the role of a caller
+func (t *AgrifoodChaincode) get_caller_role(stub shim.ChaincodeStubInterface) ([]byte, error) {
+	myLogger.Info("get caller admin status and role")
+
+	isAdmin, err := t.verifyAdmin(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error admin status of caller: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	party, err := t.getCallerParty(stub)
+	party_role := "no role"
+	if err == nil {
+		party_role = party.Role
+	}
+
+	role := CallerRole{Admin: isAdmin, Role:party_role}
+
+	role_b, err := json.Marshal(role)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling caller role: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Caller role: %s",string(role_b[:]))
+	return role_b,nil
 }
 
 // return grape provenance

@@ -6,6 +6,6 @@
   <label for="ccId">ID</label>
   <input type="text" class="form-control" id="ccId" [(ngModel)]="newCcId">
 </div>
-<p *ngIf="ccId"><strong>Current:</strong>{{ccId}}</p>
+<p *ngIf="ccId"><strong>Current:</strong> {{ccId}}</p>
 <button type="button" class="btn btn-default" (click)="update()">Update</button>
 <button *ngIf="enrolledId" type="button" class="btn btn-success" (click)="deploy()">Deploy</button>
