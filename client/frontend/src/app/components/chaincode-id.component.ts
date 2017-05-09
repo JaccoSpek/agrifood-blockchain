@@ -1,7 +1,7 @@
 import { Component, OnInit }    from '@angular/core';
 import { Observable }         from 'rxjs/Rx';
 
-import { Message,CcRole } from '../types';
+import { Message } from '../types';
 
 import { SharedService }   from '../services/shared.service';
 import { ChainService }   from '../services/chain.service';
@@ -22,6 +22,13 @@ export class ChaincodeIdComponent implements OnInit {
   getData():void {
     this.enrolledId = this.sharedService.getValue("enrolledId");
     this.ccId = this.sharedService.getValue("chaincodeID");
+    if(!this.ccId) {
+      this.chainService.get_ccid().then(result => {
+        if(result != "false") {
+          this.sharedService.setKey("chaincodeID",result);
+        }
+      });
+    }
   }
 
   ngOnInit(): void {

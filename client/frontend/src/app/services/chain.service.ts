@@ -3,8 +3,6 @@ import {Headers, Http, RequestOptions} from '@angular/http';
 
 import 'rxjs/add/operator/toPromise';
 
-import { CcRole } from '../types';
-
 @Injectable()
 export class ChainService {
   private apiURL = "http://bctb1.sensorlab.tno.nl:8081";
@@ -61,8 +59,19 @@ export class ChainService {
 
   }
 
+  get_ccid(): Promise<string> {
+    let url = `${this.apiURL}/ccid`;
+
+    return this.http.get(url, this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError);
+  }
+
   private static handleError(error: any): Promise<any> {
     console.error('An error occurred', error);
     return Promise.reject(error.message || error);
   }
+
+
 }

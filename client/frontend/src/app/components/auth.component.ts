@@ -1,7 +1,6 @@
 import { Component, OnInit }    from '@angular/core';
-import { Observable }           from 'rxjs/Rx';
 
-import { Message,CcRole } from '../types';
+import { Message } from '../types';
 
 import { SharedService } from '../services/shared.service';
 import { ChainService }   from '../services/chain.service';
@@ -14,7 +13,6 @@ import { ChainService }   from '../services/chain.service';
 export class AuthComponent implements OnInit {
   enrolledId:string;
   msg:Message;
-  role:CcRole;
 
   constructor(private sharedService:SharedService, private chainService:ChainService) {};
 
@@ -24,20 +22,10 @@ export class AuthComponent implements OnInit {
         console.log("Logged in as:",result);
         this.enrolledId = result;
         this.sharedService.setKey("enrolledId",result);
-
-        let timer = Observable.timer(0,1000);
-        timer.subscribe(t => this.getData());
       } else {
         console.log("Currently not enrolled.");
       }
     });
-  }
-
-  private getData():void {
-    if(this.role == null){
-      this.role = this.sharedService.getValue("role");
-      console.log(this.role);
-    }
   }
 
   private login(enrollId: string, enrollSecret: string): void {
