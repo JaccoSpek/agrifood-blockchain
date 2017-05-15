@@ -53,8 +53,8 @@ type AccreditationSignature struct {
 	RevocationTimestamp time.Time
 }
 
-// Entity in provenance chain
-type ProvenanceEntry struct {
+// Entity in ownership chain
+type OwnershipEntry struct {
 	PartyID		string
 	Timestamp	time.Time
 }
@@ -65,7 +65,7 @@ type GrapesUnit struct {
 	Created                 time.Time
 	UUID                    string
 	AccreditationSignatures []AccreditationSignature
-	Provenance              []ProvenanceEntry
+	Ownership               []OwnershipEntry
 }
 
 // Smart-contract
@@ -688,10 +688,10 @@ func (t *AgrifoodChaincode) create_grapes(stub shim.ChaincodeStubInterface, args
 		return nil, errors.New(msg)
 	}
 
-	// Add to provenance chain
-	provEntry := ProvenanceEntry{PartyID:party.ID,Timestamp:grapesUnit.Created}
+	// Add to ownership chain
+	ownershipEntry := OwnershipEntry{PartyID:party.ID,Timestamp:grapesUnit.Created}
 	// initiate array
-	grapesUnit.Provenance = append(grapesUnit.Provenance,provEntry)
+	grapesUnit.Ownership = append(grapesUnit.Ownership, ownershipEntry)
 
 	// save grape unit
 	err = t.saveGrapeUnit(stub,grapesUnit,true)
@@ -932,7 +932,7 @@ func (t *AgrifoodChaincode) transfer_grapes(stub shim.ChaincodeStubInterface, ar
 	}
 
 	// verify caller is current owner of grapes
-	if grapesUnit.Provenance[len(grapesUnit.Provenance)-1].PartyID != party.ID {
+	if grapesUnit.Ownership[len(grapesUnit.Ownership)-1].PartyID != party.ID {
 		msg := fmt.Sprintf("Caller is not the current owner of the grapes: %s", grapesUnit.UUID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
@@ -947,23 +947,23 @@ func (t *AgrifoodChaincode) transfer_grapes(stub shim.ChaincodeStubInterface, ar
 	}
 
 	// create new provenance entry
-	provEntry := ProvenanceEntry{PartyID:newParty.ID}
-	provEntry.Timestamp, err = time.Parse(time.RFC3339,args[2])
+	ownershipEntry := OwnershipEntry{PartyID:newParty.ID}
+	ownershipEntry.Timestamp, err = time.Parse(time.RFC3339,args[2])
 	if err != nil {
 		msg := fmt.Sprintf("Error parsing timestamp: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// verify provenance entry timestamp is after last provenance entry timestamp
-	if grapesUnit.Provenance[len(grapesUnit.Provenance)-1].Timestamp.After(provEntry.Timestamp) {
-		msg := "new provenance timestamp needs to be after latest provenance entry timestamp"
+	// verify ownership entry timestamp is after last provenance entry timestamp
+	if grapesUnit.Ownership[len(grapesUnit.Ownership)-1].Timestamp.After(ownershipEntry.Timestamp) {
+		msg := "new ownership timestamp needs to be after latest ownership entry timestamp"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
 	// append provenance entry
-	grapesUnit.Provenance = append(grapesUnit.Provenance,provEntry)
+	grapesUnit.Ownership = append(grapesUnit.Ownership, ownershipEntry)
 
 	// save to world-state
 	err = t.saveGrapeUnit(stub,grapesUnit,false)
@@ -974,7 +974,7 @@ func (t *AgrifoodChaincode) transfer_grapes(stub shim.ChaincodeStubInterface, ar
 	}
 
 	// done
-	msg := fmt.Sprintf("Successfully transferred grapes %s from %s to: %s",grapesUnit.UUID,party.ID,provEntry.PartyID)
+	msg := fmt.Sprintf("Successfully transferred grapes %s from %s to: %s",grapesUnit.UUID,party.ID, ownershipEntry.PartyID)
 	myLogger.Info(msg)
 	return []byte(msg),nil
 }
@@ -1215,8 +1215,8 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.get_roles(stub)
 	} else if function == "get_caller_role" {
 		return t.get_caller_role(stub)
-	} else if function == "grape_provenance" {
-		return t.grape_provenance(stub, args)
+	} else if function == "grape_ownership_trail" {
+		return t.grape_ownership_trail(stub, args)
 	}  else if function == "grape_signatures" {
 		return t.grape_signatures(stub, args)
 	} else if function == "signer_certs" {
@@ -1287,9 +1287,9 @@ func (t *AgrifoodChaincode) get_caller_role(stub shim.ChaincodeStubInterface) ([
 }
 
 // return grape provenance
-func (t *AgrifoodChaincode) grape_provenance(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	// public query function to check provenance of grapes
-	myLogger.Info("Get provenance of grapes..")
+func (t *AgrifoodChaincode) grape_ownership_trail(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// public query function to check ownership trail of grapes
+	myLogger.Info("Get ownership trail of grapes..")
 
 	// Check number of arguments
 	if len(args) != 1 {
@@ -1306,16 +1306,16 @@ func (t *AgrifoodChaincode) grape_provenance(stub shim.ChaincodeStubInterface, a
 		return nil, errors.New(msg)
 	}
 
-	// serialize provenance of grapes
-	grapes_provenance_b, err := json.Marshal(grapesUnit.Provenance)
+	// serialize ownership trail of grapes
+	grapes_ownership_b, err := json.Marshal(grapesUnit.Ownership)
 	if err != nil {
-		msg := fmt.Sprintf("Error marshalling grapes provenance: %s", err)
+		msg := fmt.Sprintf("Error marshalling grapes ownership trail: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
 	myLogger.Info("Return provenance")
-	return grapes_provenance_b, nil
+	return grapes_ownership_b, nil
 }
 
 // return grape certification

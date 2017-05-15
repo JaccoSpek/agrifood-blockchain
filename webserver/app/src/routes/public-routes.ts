@@ -8,8 +8,8 @@ export class PublicRoutes extends BaseChainRoute {
         console.log("[PublicRoutes.create] Creating public routes.");
 
         // get grape provenance
-        this.router.get("/grape_provenance/:uuid", (req:Request, res:Response) => {
-            this.grape_provenance(req,res);
+        this.router.get("/grape_ownership_trail/:uuid", (req:Request, res:Response) => {
+            this.grape_ownership_trail(req,res);
         });
 
         // get grape signatures
@@ -29,14 +29,14 @@ export class PublicRoutes extends BaseChainRoute {
 
     }
 
-    private grape_provenance(req:Request, res:Response):void {
+    private grape_ownership_trail(req:Request, res:Response):void {
         this.verifyQueryRequest(req,['uuid'],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
             if(err){
                 console.log("Error: %s",err.message);
                 res.status(400).send(err.message);
             } else {
                 let args = [req.params['uuid']];
-                this.queryChaincode(ccID,"grape_provenance",args,user,tcert,(err:Error, result:any)=>{
+                this.queryChaincode(ccID,"grape_ownership_trail",args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message);
