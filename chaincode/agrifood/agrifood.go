@@ -23,17 +23,17 @@ type Party struct {
 	Certs []string // encoded certificates
 }
 
-// party authorized to use a certain certificate
+// party authorized to use a certain accreditation
 type SigningAuthorization struct {
-	AuthorizedParty 	string
-	CertificateID		string
-	Expires			time.Time
-	Revoked			bool
-	RevocationTimestamp	time.Time
+	AuthorizedParty     string
+	AccreditationID     string
+	Expires             time.Time
+	Revoked             bool
+	RevocationTimestamp time.Time
 }
 
-// certificate to issue
-type SigningCertificate struct {
+// accreditation to issue
+type SigningAccreditation struct {
 	ID			string
 	Description		string
 	AccreditationBody	string
@@ -45,12 +45,12 @@ type SigningCertificate struct {
 }
 
 // signature to attach to assets
-type CertificateSignature struct {
-	Issuer			string
-	CertificateID		string
-	Issued			time.Time
-	Revoked			bool
-	RevocationTimestamp	time.Time
+type AccreditationSignature struct {
+	Issuer              string
+	AccreditationID     string
+	Issued              time.Time
+	Revoked             bool
+	RevocationTimestamp time.Time
 }
 
 // Entity in provenance chain
@@ -61,11 +61,11 @@ type ProvenanceEntry struct {
 
 // Grapes asset
 type GrapesUnit struct {
-	Producer		string
-	Created			time.Time
-	UUID			string
-	CertificateSignatures	[]CertificateSignature
-	Provenance		[]ProvenanceEntry
+	Producer                string
+	Created                 time.Time
+	UUID                    string
+	AccreditationSignatures []AccreditationSignature
+	Provenance              []ProvenanceEntry
 }
 
 // Smart-contract
@@ -83,7 +83,7 @@ func (t *AgrifoodChaincode) Init(stub shim.ChaincodeStubInterface, function stri
 	// Initiate empty arrays
 	err := stub.PutState("AdminCerts", []byte("[]"))
 	err = stub.PutState("Parties", []byte("[]"))
-	err = stub.PutState("SigningCertificates", []byte("[]"))
+	err = stub.PutState("SigningAccreditations", []byte("[]"))
 	err = stub.PutState("SigningAuthorizations", []byte("[]"))
 	err = stub.PutState("GrapeUnits", []byte("[]"))
 
@@ -119,12 +119,12 @@ func (t *AgrifoodChaincode) Invoke(stub shim.ChaincodeStubInterface, function st
 		return t.add_party(stub, args)
 	} else if function == "add_cert" {
 		return t.add_cert(stub, args)
-	} else if function == "add_signing_certificate" {
-		return t.add_signing_certificate(stub, args)
-	} else if function == "issue_signing_certificate" {
-		return t.issue_signing_certificate(stub, args)
-	} else if function == "revoke_signing_certificate" {
-		return t.revoke_signing_certificate(stub, args)
+	} else if function == "add_signing_accreditation" {
+		return t.add_signing_accreditation(stub, args)
+	} else if function == "issue_signing_accreditation" {
+		return t.issue_signing_accreditation(stub, args)
+	} else if function == "revoke_signing_accreditation" {
+		return t.revoke_signing_accreditation(stub, args)
 	} else if function == "grant_signing_authority" {
 		return t.grant_signing_authority(stub, args)
 	} else if function == "revoke_signing_authority" {
@@ -292,9 +292,9 @@ func (t *AgrifoodChaincode) add_cert(stub shim.ChaincodeStubInterface, args []st
 }
 
 // add signing certificate
-func (t *AgrifoodChaincode) add_signing_certificate(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (t *AgrifoodChaincode) add_signing_accreditation(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	// can only be called by AccreditationBody
-	myLogger.Info("Register new signing certificate")
+	myLogger.Info("Register new signing accreditation")
 
 	party, err := t.getCallerParty(stub)
 	if err != nil {
@@ -319,15 +319,15 @@ func (t *AgrifoodChaincode) add_signing_certificate(stub shim.ChaincodeStubInter
 		return nil, errors.New(msg)
 	}
 
-	signingCert := SigningCertificate{ID:args[0],Description:args[1],Revoked:false}
-	signingCert.Created, err = time.Parse(time.RFC3339,args[2])
+	signingAccreditation := SigningAccreditation{ID:args[0],Description:args[1],Revoked:false}
+	signingAccreditation.Created, err = time.Parse(time.RFC3339,args[2])
 	if err != nil {
 		msg := "Error parsing time (created date)"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	signingCert.Expires, err = time.Parse(time.RFC3339,args[3])
+	signingAccreditation.Expires, err = time.Parse(time.RFC3339,args[3])
 	if err != nil {
 		msg := "Error parsing time (expiration date)"
 		myLogger.Error(msg)
@@ -335,22 +335,22 @@ func (t *AgrifoodChaincode) add_signing_certificate(stub shim.ChaincodeStubInter
 	}
 
 	// save certificate
-	err = t.saveSigningCert(stub,signingCert,true)
+	err = t.saveSigningAccreditation(stub, signingAccreditation,true)
 	if err != nil {
-		msg := fmt.Sprintf("Error saving signing certificate: %s", err)
+		msg := fmt.Sprintf("Error saving signing accreditation: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	msg := fmt.Sprintf("New signing certificate added by %s",party.ID)
+	msg := fmt.Sprintf("New signing accreditation added by %s",party.ID)
 	myLogger.Info(msg)
 	return []byte(msg), nil
 }
 
-// issue signing certificate to certification body
-func (t *AgrifoodChaincode) issue_signing_certificate(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+// issue signing accreditation to certification body
+func (t *AgrifoodChaincode) issue_signing_accreditation(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	// can only be called by AccreditationBody
-	myLogger.Info("Assign signing certificate to a certificate body")
+	myLogger.Info("Assign signing accreditation to a certificate body")
 
 	party, err := t.getCallerParty(stub)
 	if err != nil {
@@ -370,28 +370,28 @@ func (t *AgrifoodChaincode) issue_signing_certificate(stub shim.ChaincodeStubInt
 
 	// Check number of arguments
 	if len(args) != 2 {
-		msg := "Incorrect number of arguments. Expecting 2" // CertificateID, Certificate body ID
+		msg := "Incorrect number of arguments. Expecting 2" // AccreditationID, Certificate body ID
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// get certificate
-	certificate, err := t.getSigningCert(stub,args[0])
+	// get accreditation
+	accreditation, err := t.getSigningAccreditation(stub,args[0])
 	if err != nil {
-		msg := fmt.Sprintf("Error determining certificate: %s", err)
+		msg := fmt.Sprintf("Error determining accreditation: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// see if certificate is still valid
-	if certificate.Expires.Before(time.Now()) {
-		msg := "Error: Certificate expired"
+	// see if accreditation is still valid
+	if accreditation.Expires.Before(time.Now()) {
+		msg := "Error: Accreditation expired"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	if certificate.AccreditationBody != party.ID {
-		msg := fmt.Sprintf("Error: Accreditation body (%s) is not the issuer of this certificate (%s)",party.ID,certificate.ID)
+	if accreditation.AccreditationBody != party.ID {
+		msg := fmt.Sprintf("Error: Accreditation body (%s) is not the issuer of this accreditation (%s)",party.ID, accreditation.ID)
 		myLogger.Warning(msg)
 		return nil, errors.New(msg)
 	}
@@ -411,26 +411,26 @@ func (t *AgrifoodChaincode) issue_signing_certificate(stub shim.ChaincodeStubInt
 		return nil, errors.New(msg)
 	}
 
-	// set certificationbody on certificate
-	certificate.CertificationBody = certBody.ID
+	// set certification body on accreditation
+	accreditation.CertificationBody = certBody.ID
 
 	// save updated certificate
-	err = t.saveSigningCert(stub,certificate,false)
+	err = t.saveSigningAccreditation(stub, accreditation,false)
 	if err != nil {
 		msg := "Error saving certificate"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	msg := fmt.Sprintf("Successfully added %s as certification body on %s",certBody.ID,certificate.ID)
+	msg := fmt.Sprintf("Successfully added %s as certification body on %s",certBody.ID, accreditation.ID)
 	myLogger.Info(msg)
 	return []byte(msg), nil
 }
 
-// revoke signing certificate
-func (t *AgrifoodChaincode) revoke_signing_certificate(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+// revoke signing accreditation
+func (t *AgrifoodChaincode) revoke_signing_accreditation(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	// can only be called by AccreditationBody or auditor
-	myLogger.Info("Revoke signing certificate")
+	myLogger.Info("Revoke signing accreditation")
 
 	party, err := t.getCallerParty(stub)
 	if err != nil {
@@ -450,44 +450,44 @@ func (t *AgrifoodChaincode) revoke_signing_certificate(stub shim.ChaincodeStubIn
 
 	// Check number of arguments
 	if len(args) != 2 {
-		msg := "Incorrect number of arguments. Expecting 2" // CertificateID, revokeTimestamp
+		msg := "Incorrect number of arguments. Expecting 2" // AccreditationID, revokeTimestamp
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// get certificate
-	certificate, err := t.getSigningCert(stub,args[0])
+	// get accreditation
+	accreditation, err := t.getSigningAccreditation(stub,args[0])
 	if err != nil {
-		msg := fmt.Sprintf("Error determining certificate: %s", err)
+		msg := fmt.Sprintf("Error determining accreditation: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
 	// verify if accreditation body is owner of certificate
-	if party.Role == t.roles[0] && certificate.AccreditationBody != party.ID {
-		msg := fmt.Sprintf("Error: Accreditation body (%s) is not the issuer of this certificate (%s)",party.ID,certificate.ID)
+	if party.Role == t.roles[0] && accreditation.AccreditationBody != party.ID {
+		msg := fmt.Sprintf("Error: Accreditation body (%s) is not the issuer of this accreditation (%s)",party.ID, accreditation.ID)
 		myLogger.Warning(msg)
 		return nil, errors.New(msg)
 	}
 
 	// Revoke certificate
-	certificate.Revoked = true
-	certificate.RevocationTimestamp, err = time.Parse(time.RFC3339, args[1])
+	accreditation.Revoked = true
+	accreditation.RevocationTimestamp, err = time.Parse(time.RFC3339, args[1])
 	if err != nil {
 		msg := "Error parsing time"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// save updated certificate
-	err = t.saveSigningCert(stub, certificate, false)
+	// save updated accreditation
+	err = t.saveSigningAccreditation(stub, accreditation, false)
 	if err != nil {
-		msg := "Error saving updated certificate"
+		msg := "Error saving updated accreditation"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	msg := fmt.Sprintf("Successfully revoked signing certificate %s",certificate.ID)
+	msg := fmt.Sprintf("Successfully revoked signing accreditation %s", accreditation.ID)
 	myLogger.Info(msg)
 	return []byte(msg),nil
 }
@@ -506,7 +506,7 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 
 	myLogger.Debugf("Received party: %s, role:%s", party.ID, party.Role)
 
-	// check if caller is a AccreditationBody
+	// check if caller is a CertificationBody
 	if party.Role != t.roles[1] {
 		msg := "Caller is not a CertificationBody"
 		myLogger.Error(msg)
@@ -515,29 +515,29 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 
 	// Check number of arguments
 	if len(args) != 3 {
-		msg := "Incorrect number of arguments. Expecting 3" // CertificateID, authorized partyID, Expiration timestamp
+		msg := "Incorrect number of arguments. Expecting 3" // AccreditationID, authorized partyID, Expiration timestamp
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// get certificate
-	certificate, err := t.getSigningCert(stub,args[0])
+	// get accreditation
+	accreditation, err := t.getSigningAccreditation(stub,args[0])
 	if err != nil {
-		msg := fmt.Sprintf("Error determining certificate: %s", err)
+		msg := fmt.Sprintf("Error determining accreditation: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// see if certificate is still valid
-	if certificate.Expires.Before(time.Now()) {
-		msg := "Error: Certificate expired"
+	// see if accreditation is still valid
+	if accreditation.Expires.Before(time.Now()) {
+		msg := "Error: Accreditation expired"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
 	// verify access rights
-	if certificate.CertificationBody != party.ID {
-		msg := fmt.Sprintf("Party %s is not the certification body of %s", party.ID, certificate.ID)
+	if accreditation.CertificationBody != party.ID {
+		msg := fmt.Sprintf("Party %s is not the certification body of %s", party.ID, accreditation.ID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -551,7 +551,7 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 	}
 
 	// create and save signing authorization
-	signingAuthorization := SigningAuthorization{AuthorizedParty:authorizedParty.ID,CertificateID:certificate.ID,Revoked:false}
+	signingAuthorization := SigningAuthorization{AuthorizedParty:authorizedParty.ID, AccreditationID:accreditation.ID,Revoked:false}
 	signingAuthorization.Expires, err = time.Parse(time.RFC3339,args[2])
 	if err != nil {
 		msg := "Error parsing time (expiration date)"
@@ -566,7 +566,7 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 		return nil, errors.New(msg)
 	}
 
-	msg := fmt.Sprintf("Successfully granted signing authority of %s to %s",signingAuthorization.CertificateID,signingAuthorization.AuthorizedParty)
+	msg := fmt.Sprintf("Successfully granted signing authority of %s to %s",signingAuthorization.AccreditationID,signingAuthorization.AuthorizedParty)
 	myLogger.Info(msg)
 	return []byte(msg),nil
 }
@@ -594,22 +594,22 @@ func (t *AgrifoodChaincode) revoke_signing_authority(stub shim.ChaincodeStubInte
 
 	// Check number of arguments
 	if len(args) != 3 {
-		msg := "Incorrect number of arguments. Expecting 3" // CertificateID, authorized partyID, revokeTimestamp
+		msg := "Incorrect number of arguments. Expecting 3" // AccreditationID, authorized partyID, revokeTimestamp
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
 	// get certificate
-	certificate, err := t.getSigningCert(stub,args[0])
+	accreditation, err := t.getSigningAccreditation(stub,args[0])
 	if err != nil {
-		msg := fmt.Sprintf("Error determining certificate: %s", err)
+		msg := fmt.Sprintf("Error determining accreditation: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
 	// verify access rights
-	if party.Role != t.roles[1] && certificate.CertificationBody != party.ID {
-		msg := fmt.Sprintf("Party %s is not the certification body of %s", party.ID, certificate.ID)
+	if party.Role != t.roles[1] && accreditation.CertificationBody != party.ID {
+		msg := fmt.Sprintf("Party %s is not the certification body of %s", party.ID, accreditation.ID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -622,7 +622,7 @@ func (t *AgrifoodChaincode) revoke_signing_authority(stub shim.ChaincodeStubInte
 		return nil, errors.New(msg)
 	}
 
-	signingAuthorization, err := t.getSigningAuthorization(stub,certificate.ID,authorizedParty.ID)
+	signingAuthorization, err := t.getSigningAuthorization(stub, accreditation.ID,authorizedParty.ID)
 	if err != nil {
 		msg := fmt.Sprintf("Error determining signingAuthorization: %s", err)
 		myLogger.Error(msg)
@@ -646,7 +646,7 @@ func (t *AgrifoodChaincode) revoke_signing_authority(stub shim.ChaincodeStubInte
 		return nil, errors.New(msg)
 	}
 
-	msg := fmt.Sprintf("Successfully granted signing authority of %s to %s",signingAuthorization.CertificateID,signingAuthorization.AuthorizedParty)
+	msg := fmt.Sprintf("Successfully granted signing authority of %s to %s",signingAuthorization.AccreditationID,signingAuthorization.AuthorizedParty)
 	myLogger.Info(msg)
 	return []byte(msg),nil
 }
@@ -759,45 +759,45 @@ func (t *AgrifoodChaincode) certify_grapes(stub shim.ChaincodeStubInterface, arg
 
 	// validate sigining authority
 	if signAuth.Revoked {
-		msg := fmt.Sprintf("No signing authority for %s on %s",signAuth.CertificateID,party.ID)
+		msg := fmt.Sprintf("No signing authority for %s on %s",signAuth.AccreditationID,party.ID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
 	// check expiration date
 	if signAuth.Expires.Before(time.Now()){
-		msg := fmt.Sprintf("Signing authority for %s by %s has expired",signAuth.CertificateID,party.ID)
+		msg := fmt.Sprintf("Signing authority for %s by %s has expired",signAuth.AccreditationID,party.ID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// get certificate
-	certificate, err := t.getSigningCert(stub,signAuth.CertificateID)
+	// get accreditation
+	accreditation, err := t.getSigningAccreditation(stub,signAuth.AccreditationID)
 	if err != nil {
-		msg := fmt.Sprintf("Error determining certificate: %s", err)
+		msg := fmt.Sprintf("Error determining accreditation: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// see if certificate is valid
-	if certificate.Revoked {
-		msg := fmt.Sprintf("Invalid signing certificate: %s",certificate.ID)
+	// see if accreditation is valid
+	if accreditation.Revoked {
+		msg := fmt.Sprintf("Invalid signing accreditation: %s", accreditation.ID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
 	// check expiration date
-	if certificate.Expires.Before(time.Now()){
-		msg := fmt.Sprintf("Certificate %s has expired",signAuth.CertificateID)
+	if accreditation.Expires.Before(time.Now()){
+		msg := fmt.Sprintf("Accreditation %s has expired",signAuth.AccreditationID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	// certificate is valid
+	// accreditation is valid
 
-	// actually attach certificate signature to grapes
-	certSignature := CertificateSignature{Issuer:signAuth.AuthorizedParty,CertificateID:certificate.ID,Revoked:false}
-	certSignature.Issued, err = time.Parse(time.RFC3339, args[2])
+	// actually attach accreditation signature to grapes
+	signature := AccreditationSignature{Issuer:signAuth.AuthorizedParty, AccreditationID:accreditation.ID,Revoked:false}
+	signature.Issued, err = time.Parse(time.RFC3339, args[2])
 	if err != nil {
 		msg := "Error parsing time"
 		myLogger.Error(msg)
@@ -805,7 +805,7 @@ func (t *AgrifoodChaincode) certify_grapes(stub shim.ChaincodeStubInterface, arg
 	}
 
 	// append signature to grapes unit
-	grapesUnit.CertificateSignatures = append(grapesUnit.CertificateSignatures,certSignature)
+	grapesUnit.AccreditationSignatures = append(grapesUnit.AccreditationSignatures, signature)
 
 	// save to world-state
 	err = t.saveGrapeUnit(stub,grapesUnit,false)
@@ -864,9 +864,9 @@ func (t *AgrifoodChaincode) revoke_signature(stub shim.ChaincodeStubInterface, a
 	}
 
 	// loop over signatures
-	for i, signature := range grapeUnit.CertificateSignatures {
+	for i, signature := range grapeUnit.AccreditationSignatures {
 		// find correct signature
-		if signature.CertificateID == args[2] {
+		if signature.AccreditationID == args[2] {
 			// revoke signature
 			signature.Revoked = true
 			signature.RevocationTimestamp, err = time.Parse(time.RFC3339,args[3])
@@ -877,7 +877,7 @@ func (t *AgrifoodChaincode) revoke_signature(stub shim.ChaincodeStubInterface, a
 			}
 
 			// update signature
-			grapeUnit.CertificateSignatures[i] = signature
+			grapeUnit.AccreditationSignatures[i] = signature
 		}
 	}
 
@@ -989,7 +989,7 @@ func (t *AgrifoodChaincode) saveGrapeUnit(stub shim.ChaincodeStubInterface, grap
 	}
 
 	if !new { //update
-		// set new signing certificate state
+		// set new grape unit state
 		for i, v := range grapes {
 			if v.UUID == grapeUnit.UUID {
 				grapes[i] = grapeUnit
@@ -1039,14 +1039,14 @@ func (t *AgrifoodChaincode) saveSigningAuthorization(stub shim.ChaincodeStubInte
 	if !new { //update
 		// set signing authorizations
 		for i, v := range signing_auths {
-			if v.AuthorizedParty == signingAuth.AuthorizedParty && v.CertificateID == signingAuth.CertificateID {
+			if v.AuthorizedParty == signingAuth.AuthorizedParty && v.AccreditationID == signingAuth.AccreditationID {
 				signing_auths[i] = signingAuth
 			}
 		}
 	} else { // save new
 		// verify uniqueness
 		for _, v := range signing_auths {
-			if v.AuthorizedParty == signingAuth.AuthorizedParty && v.CertificateID == signingAuth.CertificateID {
+			if v.AuthorizedParty == signingAuth.AuthorizedParty && v.AccreditationID == signingAuth.AccreditationID {
 				msg := "Error: sighing authorization needs to be unique"
 				myLogger.Error(msg)
 				return errors.New(msg)
@@ -1076,46 +1076,46 @@ func (t *AgrifoodChaincode) saveSigningAuthorization(stub shim.ChaincodeStubInte
 }
 
 // save signing certificate to world-state
-func (t *AgrifoodChaincode) saveSigningCert(stub shim.ChaincodeStubInterface, signingCert SigningCertificate, new bool) error {
-	signing_certs, err := t.getSigningCerts(stub)
+func (t *AgrifoodChaincode) saveSigningAccreditation(stub shim.ChaincodeStubInterface, signingAccreditation SigningAccreditation, new bool) error {
+	signing_accreditations, err := t.getSigningAccreditations(stub)
 	if err != nil {
-		msg := fmt.Sprintf("Error retrieving signing certs: %s", err)
+		msg := fmt.Sprintf("Error retrieving signing accreditations: %s", err)
 		myLogger.Error(msg)
 		return errors.New(msg)
 	}
 
 	if !new { //update
-		// set new signing certificate state
-		for i, v := range signing_certs {
-			if v.ID == signingCert.ID {
-				signing_certs[i] = signingCert
+		// set new signing accreditation state
+		for i, v := range signing_accreditations {
+			if v.ID == signingAccreditation.ID {
+				signing_accreditations[i] = signingAccreditation
 			}
 		}
 	} else { // save new
 		// verify uniqueness
-		for _, v := range signing_certs {
-			if v.ID == signingCert.ID {
-				msg := "Error: Certificate ID needs to be unique"
+		for _, v := range signing_accreditations {
+			if v.ID == signingAccreditation.ID {
+				msg := "Error: accreditation ID needs to be unique"
 				myLogger.Error(msg)
 				return errors.New(msg)
 			}
 		}
 		// append to array
-		signing_certs = append(signing_certs, signingCert)
+		signing_accreditations = append(signing_accreditations, signingAccreditation)
 	}
 
-	// serialize certs
-	signing_certs_b, err := json.Marshal(signing_certs)
+	// serialize accreditations
+	signing_accreditations_b, err := json.Marshal(signing_accreditations)
 	if err != nil {
-		msg := "Error marshalling signing_certs"
+		msg := "Error marshalling signing_accreditations"
 		myLogger.Error(msg)
 		return errors.New(msg)
 	}
 
-	// save serialized signing certificate
-	err = stub.PutState("SigningCertificates", signing_certs_b)
+	// save serialized signing accreditations
+	err = stub.PutState("SigningAccreditations", signing_accreditations_b)
 	if err != nil {
-		msg := "Error saving SigningCertificates"
+		msg := "Error saving SigningAccreditations"
 		myLogger.Error(msg)
 		return errors.New(msg)
 	}
@@ -1168,8 +1168,6 @@ func (t *AgrifoodChaincode) saveParty(stub shim.ChaincodeStubInterface, party Pa
 		return errors.New(msg)
 	}
 
-	//myLogger.Debugf("Parties: %s",string(parties_b[:]))
-
 	return nil
 }
 
@@ -1213,18 +1211,49 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 	myLogger.Debug("Query Chaincode...")
 
 	// Handle different functions
-	if function == "get_caller_role" {
+	if function == "get_roles" {
+		return t.get_roles(stub)
+	} else if function == "get_caller_role" {
 		return t.get_caller_role(stub)
-	} else if function == "grape_certification" {
-		return t.grape_certification(stub, args)
-	}  else if function == "grape_certification" {
-		return t.grape_certification(stub, args)
+	} else if function == "grape_provenance" {
+		return t.grape_provenance(stub, args)
+	}  else if function == "grape_signatures" {
+		return t.grape_signatures(stub, args)
 	} else if function == "signer_certs" {
 		return t.signer_certs(stub, args)
 	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
 	return nil, errors.New("Received unknown query function")
+}
+
+// get available roles
+func (t *AgrifoodChaincode) get_roles(stub shim.ChaincodeStubInterface) ([]byte, error) {
+	// Return available roles
+	myLogger.Info("Get roles..")
+
+	isAdmin, err := t.verifyAdmin(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error verifying caller status: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	if !isAdmin {
+		msg := "Caller is not an admin"
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	roles_b, err := json.Marshal(t.roles)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling roles: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Info("Return roles")
+	return roles_b,nil
 }
 
 // return the role of a caller
@@ -1290,9 +1319,9 @@ func (t *AgrifoodChaincode) grape_provenance(stub shim.ChaincodeStubInterface, a
 }
 
 // return grape certification
-func (t *AgrifoodChaincode) grape_certification(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	// public query function to check certification of grapes
-	myLogger.Info("Get certification of grapes..")
+func (t *AgrifoodChaincode) grape_signatures(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// public query function to check accreditation of grapes
+	myLogger.Info("Get accreditation of grapes..")
 
 	// Check number of arguments
 	if len(args) != 1 {
@@ -1309,16 +1338,16 @@ func (t *AgrifoodChaincode) grape_certification(stub shim.ChaincodeStubInterface
 		return nil, errors.New(msg)
 	}
 
-	// serialize certificates
-	grapes_certificates_b, err := json.Marshal(grapesUnit.CertificateSignatures[0])
+	// serialize signatures
+	grapes_signatures_b, err := json.Marshal(grapesUnit.AccreditationSignatures[0])
 	if err != nil {
 		msg := fmt.Sprintf("Error marshalling grapes certificates: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	myLogger.Info("Return certificates")
-	return grapes_certificates_b,nil
+	myLogger.Info("Return signatures")
+	return grapes_signatures_b,nil
 }
 
 // return signing authorizations of party for certificate
@@ -1415,7 +1444,7 @@ func (t *AgrifoodChaincode) getSigningAuthorization(stub shim.ChaincodeStubInter
 	}
 
 	for _, auth := range auths {
-		if auth.CertificateID == certID && auth.AuthorizedParty == partyID {
+		if auth.AccreditationID == certID && auth.AuthorizedParty == partyID {
 			return auth, nil
 		}
 	}
@@ -1444,43 +1473,43 @@ func (t *AgrifoodChaincode) getSigningAuthorizations(stub shim.ChaincodeStubInte
 	return signing_auths, nil
 }
 
-// get specific signing certificate
-func (t *AgrifoodChaincode) getSigningCert(stub shim.ChaincodeStubInterface, certID string) (SigningCertificate, error) {
-	certs, err := t.getSigningCerts(stub)
+// get specific signing accreditation
+func (t *AgrifoodChaincode) getSigningAccreditation(stub shim.ChaincodeStubInterface, certID string) (SigningAccreditation, error) {
+	accreditations, err := t.getSigningAccreditations(stub)
 	if err != nil {
-		msg := fmt.Sprintf("Error retreiving certificates: %s", err)
+		msg := fmt.Sprintf("Error retreiving accreditations: %s", err)
 		myLogger.Error(msg)
-		return SigningCertificate{}, errors.New(msg)
+		return SigningAccreditation{}, errors.New(msg)
 	}
 
-	for _, cert := range certs {
-		if cert.ID == certID {
-			return cert, nil
+	for _, accreditation := range accreditations {
+		if accreditation.ID == certID {
+			return accreditation, nil
 		}
 	}
 
-	return SigningCertificate{}, errors.New("Unable to determine SigningCertificate")
+	return SigningAccreditation{}, errors.New("Unable to determine SigningAccreditation")
 }
 
-// get all signing certificates
-func (t *AgrifoodChaincode) getSigningCerts(stub shim.ChaincodeStubInterface) ([]SigningCertificate, error) {
+// get all signing accreditations
+func (t *AgrifoodChaincode) getSigningAccreditations(stub shim.ChaincodeStubInterface) ([]SigningAccreditation, error) {
 	// get certificates
-	signing_certs_b, err := stub.GetState("SigningCertificates")
+	signing_accreditations_b, err := stub.GetState("SigningAccreditations")
 	if err != nil {
-		msg := fmt.Sprintf("Error getting signing certificates from storage: %s", err)
+		msg := fmt.Sprintf("Error getting signing accreditations from storage: %s", err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	var signing_certs []SigningCertificate
-	err = json.Unmarshal(signing_certs_b, &signing_certs)
+	var signing_accreditations []SigningAccreditation
+	err = json.Unmarshal(signing_accreditations_b, &signing_accreditations)
 	if err != nil {
-		msg := "Error parsing signing certificates"
+		msg := "Error parsing signing accreditations"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
 
-	return signing_certs, nil
+	return signing_accreditations, nil
 }
 
 // get caller party object

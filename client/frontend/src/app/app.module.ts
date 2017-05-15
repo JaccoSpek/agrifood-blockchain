@@ -10,7 +10,8 @@ import { AppRoutingModule } from './modules/app-routing.module';
 
 import { AuthComponent } from './components/auth.component';
 import { ChaincodeIdComponent } from './components/chaincode-id.component';
-import { AdminComponent } from './components/admin.component';
+import { AdminComponent } from './components/admin/admin.component';
+import { AddPartyComponent } from "./components/admin/add-party.component";
 
 @NgModule({
   imports:      [ BrowserModule, HttpModule, FormsModule, AppRoutingModule ],
@@ -18,7 +19,8 @@ import { AdminComponent } from './components/admin.component';
     AppComponent,
     AuthComponent,
     ChaincodeIdComponent,
-    AdminComponent
+    AdminComponent,
+    AddPartyComponent
   ],
   providers:    [ SharedService, ChainService ],
   bootstrap:    [ AppComponent ]

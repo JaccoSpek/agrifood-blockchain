@@ -12,9 +12,9 @@ export class PublicRoutes extends BaseChainRoute {
             this.grape_provenance(req,res);
         });
 
-        // get grape certification
-        this.router.get("/grape_certification/:uuid", (req:Request, res:Response) => {
-            this.grape_certification(req,res);
+        // get grape signatures
+        this.router.get("/grape_signatures/:uuid", (req:Request, res:Response) => {
+            this.grape_signatures(req,res);
         });
 
         // get signer authorizations
@@ -49,14 +49,14 @@ export class PublicRoutes extends BaseChainRoute {
         });
     }
 
-    private grape_certification(req:Request, res:Response):void {
+    private grape_signatures(req:Request, res:Response):void {
         this.verifyQueryRequest(req,['uuid'],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
             if(err){
                 console.log("Error: %s",err.message);
                 res.status(400).send(err.message);
             } else {
                 let args = [req.params['uuid']];
-                this.queryChaincode(ccID,"grape_certification",args,user,tcert,(err:Error, result:any)=>{
+                this.queryChaincode(ccID,"grape_signatures",args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message);

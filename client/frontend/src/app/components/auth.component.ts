@@ -23,8 +23,7 @@ export class AuthComponent implements OnInit {
     if(this.enrolledId && ccID){
       if(!this.role){
         this.chainService.get_caller_role().then(result => {
-          this.role = result;
-          console.log("User role:",this.role);
+          this.role = result as CcRole;
           this.sharedService.setKey("role",JSON.stringify(this.role));
         });
       }
@@ -37,13 +36,13 @@ export class AuthComponent implements OnInit {
         console.log("Logged in as:",result);
         this.enrolledId = result;
         this.sharedService.setKey("enrolledId",result);
-
-        let timer = Observable.timer(0,1000);
-        timer.subscribe(t => this.getRole());
       } else {
         console.log("Currently not enrolled.");
       }
     });
+
+    let timer = Observable.timer(0,1000);
+    timer.subscribe(t => this.getRole());
   }
 
   private login(enrollId: string, enrollSecret: string): void {

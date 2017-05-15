@@ -77,10 +77,29 @@ export class ChainService {
       .catch(ChainService.handleError)
   }
 
+  get_roles(): Promise<string[]> {
+    let url = `${this.apiURL}/roles`;
+
+    return this.http.get(url, this.opts)
+      .toPromise()
+      .then(response => response.json() as string[])
+      .catch(ChainService.handleError)
+  }
+
+  add_party(id:string,role:string): Promise<string> {
+    let url = `${this.apiURL}/add_party`;
+
+    let args:any = {id:id,role:role};
+
+    return this.http.post(url,args,this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError)
+  }
+
   private static handleError(error: any): Promise<any> {
     console.error('An error occurred', error);
     return Promise.reject(error.message || error);
   }
-
 
 }

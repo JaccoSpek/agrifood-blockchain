@@ -8,8 +8,8 @@ export class AuditorRoutes extends BaseChainRoute {
         console.log("[AuditorRoutes.create] Creating Auditor routes.");
 
         // revoke signing certificate
-        this.router.post("/auditor/revoke_signing_certificate", (req:Request, res:Response) => {
-            this.revoke_signing_certificate(req,res);
+        this.router.post("/auditor/revoke_signing_accreditation", (req:Request, res:Response) => {
+            this.revoke_signing_accreditation(req,res);
         });
 
         // revoke signing authority from party
@@ -23,14 +23,14 @@ export class AuditorRoutes extends BaseChainRoute {
         });
     }
 
-    private revoke_signing_certificate(req:Request, res:Response):void {
+    private revoke_signing_accreditation(req:Request, res:Response):void {
         this.verifyRequest(req,["cid","timestamp"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
             if(err) {
                 console.log("Error: %s",err.message);
                 res.status(400).send(err.message)
             } else {
                 let args = [req.body['cid'],req.body['timestamp']];
-                this.invokeChaincode(ccID,'revoke_signing_certificate',args,user,tcert,(err:Error, result:any)=>{
+                this.invokeChaincode(ccID,'revoke_signing_accreditation',args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message)

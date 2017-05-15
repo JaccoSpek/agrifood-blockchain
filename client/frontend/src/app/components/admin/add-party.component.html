@@ -1,0 +1,17 @@
+<h4>Add party</h4>
+<div class="alert" [ngClass]="msg.level" *ngIf="msg">
+  <strong>{{msg.text}}</strong>
+</div>
+<div class="form-group">
+  <label for="partyname">Party:</label>
+  <input type="text" class="form-control" id="partyname" [(ngModel)]="party">
+</div>
+<div class="form-group">
+  <label for="partyrole">Role:</label>
+  <select id="partyrole" class="form-control" [(ngModel)]="selectedRole">
+    <option *ngFor="let role of roles" [value]="role">{{role}}</option>
+  </select>
+</div>
+<div class="form-group">
+  <button type="button" class="btn btn-success" (click)="addUserRole(party,selectedRole)">Add party to contract</button>
+</div>

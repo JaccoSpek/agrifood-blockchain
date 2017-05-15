@@ -16,6 +16,11 @@ export class AdminRoutes extends BaseChainRoute {
         this.router.post("/add_party", (req:Request, res:Response) => {
             this.addParty(req, res);
         });
+
+        // get available roles
+        this.router.get("/roles", (req:Request, res:Response) => {
+           this.get_roles(req, res);
+        });
     }
 
     private addAdmin(req:Request, res:Response):void {
@@ -52,19 +57,45 @@ export class AdminRoutes extends BaseChainRoute {
                         res.status(400).send(err.message)
                     } else {
                         let certs:any[] = JSON.parse(certsStr);
-                        let party_tcert:TCert = this.getTCert(certs[0]);
-                        let pubkey_enc = new Buffer(party_tcert.cert).toString('base64');
+                        if(certs !== null && certs.length > 0) {
+                            let party_tcert:TCert = this.getTCert(certs[0]);
+                            let pubkey_enc = new Buffer(party_tcert.cert).toString('base64');
 
-                        let args:any[] = [req.body['id'],req.body['role'],pubkey_enc];
-                        this.invokeChaincode(ccID,'add_party',args,user,tcert,(err:Error, result:any)=>{
-                            if(err) {
-                                console.log("Error: %s",err.message);
-                                res.status(400).send(err.message)
-                            } else {
-                                console.log("successfully executed transaction: %s", result);
-                                res.send("successfully executed transaction");
-                            }
-                        });
+                            let args:any[] = [req.body['id'],req.body['role'],pubkey_enc];
+                            this.invokeChaincode(ccID,'add_party',args,user,tcert,(err:Error, result:any)=>{
+                                if(err) {
+                                    console.log("Error: %s",err.message);
+                                    res.status(400).send(err.message);
+                                } else {
+                                    console.log("successfully executed transaction: %s", result);
+                                    res.send("successfully executed transaction");
+                                }
+                            });
+                        } else {
+                            let msg = "Error: unknown user";
+                            console.log(msg);
+                            res.status(400).send(msg)
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    private get_roles(req:Request, res:Response):void {
+        this.verifyQueryRequest(req,[],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+            if(err){
+                console.log("Error: %s",err.message);
+                res.status(400).send(err.message);
+            } else {
+                let args = [];
+                this.queryChaincode(ccID,"get_roles",args,user,tcert,(err:Error, result:any)=>{
+                    if(err) {
+                        console.log("Error: %s",err.message);
+                        res.status(400).send(err.message);
+                    } else {
+                        console.log("Queried results: %s", result);
+                        res.type('json').send(result);
                     }
                 });
             }

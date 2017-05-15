@@ -1,9 +1,9 @@
 import { Component, OnInit }    from '@angular/core';
 import { Observable }         from 'rxjs/Rx';
 
-import { CcRole } from '../types';
+import { CcRole } from '../../types';
 
-import { SharedService } from '../services/shared.service';
+import { SharedService } from '../../services/shared.service';
 
 @Component({
   moduleId: module.id,
@@ -17,7 +17,10 @@ export class AdminComponent implements OnInit {
 
   getRole():void {
     if(!this.role){
-      this.role = JSON.parse(this.sharedService.getValue("role")) as CcRole;
+      let role:CcRole = JSON.parse(this.sharedService.getValue("role")) as CcRole;
+      if(role !== null){
+        this.role = role;
+      }
     }
   }
 
