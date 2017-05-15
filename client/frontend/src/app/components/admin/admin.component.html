@@ -1,6 +1,14 @@
 <div class="row">
   <div class="col-md-8">
     <h3>Admin panel</h3>
+    <div class="alert alert-warning" *ngIf="!(role && role.Admin)">
+      <strong>You need to be admin to view this page</strong>
+    </div>
+
+    <ul class="nav nav-tabs" *ngIf="role && role.Admin">
+      <li role="presentation" routerLinkActive="active"><a routerLink="add_party">Add party</a></li>
+    </ul>
+
     <router-outlet></router-outlet>
   </div>
 </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit }    from '@angular/core';
 import {ChainService} from "../../services/chain.service";
 import { SharedService } from '../../services/shared.service';
-import {Message} from "../../types";
+import {CcRole, Message} from "../../types";
 import {AdminComponent} from "./admin.component";
 
 @Component({
@@ -18,9 +18,13 @@ export class AddPartyComponent extends AdminComponent implements OnInit{
   };
 
   ngOnInit():void {
-    this.chainService.get_roles().then(result => {
-      this.roles = result;
-    });
+    super.ngOnInit();
+    let role:CcRole = JSON.parse(this.sharedServ.getValue("role")) as CcRole;
+    if(role != null) {
+      this.chainService.get_roles().then(result => {
+        this.roles = result;
+      });
+    }
   }
 
   private addUserRole(user:string, role:string):void {

@@ -7,7 +7,7 @@ import { AddPartyComponent } from '../components/admin/add-party.component';
 const routes: Routes = [
   { path: '', redirectTo: '/', pathMatch: 'full' },
   { path: 'admin', component: AdminComponent, children: [
-    { path: 'add_party', component:AddPartyComponent }
+    { path: 'add_party', component:AddPartyComponent}
   ]},
 ];
 
