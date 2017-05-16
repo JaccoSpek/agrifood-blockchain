@@ -16,6 +16,7 @@
     <li role="presentation" routerLinkActive="active" *ngIf="role && role.Role == 'Farm'"><a routerLink="/farm">Farm</a></li>
     <li role="presentation" routerLinkActive="active" *ngIf="role && role.Role == 'Auditor'"><a routerLink="/auditor">Auditor</a></li>
     <li role="presentation" routerLinkActive="active" *ngIf="role && role.Role == 'Trader'"><a routerLink="/trader">Trader</a></li>
+    <li role="presentation" routerLinkActive="active" *ngIf="role"><a routerLink="/public">Public functions</a></li>
   </ul>
   <router-outlet></router-outlet>
 </div>

@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-md-8">
+    <h3>Public panel</h3>
+    <div class="alert alert-warning" *ngIf="!role">
+      <strong>You need to be enrolled to interact with the application</strong>
+    </div>
+
+    <ul class="nav nav-tabs" *ngIf="role">
+      <li role="presentation" routerLinkActive="active"><a routerLink="grape_ownership_trail">Grape ownership trail</a></li>
+      <li role="presentation" routerLinkActive="active"><a routerLink="grape_signatures">Grape certifications</a></li>
+      <li role="presentation" routerLinkActive="active"><a routerLink="signer_certs">Authorized signatures</a></li>
+    </ul>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>

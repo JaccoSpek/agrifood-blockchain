@@ -29,6 +29,10 @@ import {AuditorRevokeSigningAuthorityComponent} from "./components/auditor/audit
 import {AuditorRevokeSignatureComponent} from "./components/auditor/auditor-revoke-signature";
 import {TraderComponent} from "./components/trader/trader.component";
 import {TraderTransferGrapesComponent} from "./components/trader/trader-transfer-grapes.component";
+import {PublicComponent} from "./components/public/public.component";
+import {GrapeOwnerShipTrailComponent} from "./components/public/grape-ownership-trail.component";
+import {GrapeSignaturesComponent} from "./components/public/grape-signatures.component";
+import {SignerCertsComponent} from "./components/public/signer-certs.component";
 
 @NgModule({
   imports:      [ BrowserModule, HttpModule, FormsModule, AppRoutingModule ],
@@ -54,7 +58,11 @@ import {TraderTransferGrapesComponent} from "./components/trader/trader-transfer
     AuditorRevokeSigningAuthorityComponent,
     AuditorRevokeSignatureComponent,
     TraderComponent,
-    TraderTransferGrapesComponent
+    TraderTransferGrapesComponent,
+    PublicComponent,
+    GrapeOwnerShipTrailComponent,
+    GrapeSignaturesComponent,
+    SignerCertsComponent
   ],
   providers:    [ SharedService, ChainService ],
   bootstrap:    [ AppComponent ]

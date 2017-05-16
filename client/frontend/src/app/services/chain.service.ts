@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import {Headers, Http, RequestOptions} from '@angular/http';
 import { CcRole } from '../types';
 import 'rxjs/add/operator/toPromise';
+import { API_URL } from '../config';
 
 @Injectable()
 export class ChainService {
-  // TODO: Hard-coded URL configureerbaar maken
-  private apiURL = "http://bctb1.sensorlab.tno.nl:8081";
+  private apiURL = API_URL;
   private headers = new Headers({'Content-Type': 'application/json'});
   private opts = new RequestOptions({headers:this.headers, withCredentials: true });
 
