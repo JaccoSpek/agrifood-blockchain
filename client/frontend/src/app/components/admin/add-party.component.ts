@@ -2,14 +2,14 @@ import { Component, OnInit }    from '@angular/core';
 import {ChainService} from "../../services/chain.service";
 import { SharedService } from '../../services/shared.service';
 import {CcRole, Message} from "../../types";
-import {AdminComponent} from "./admin.component";
+import {AppComponent} from "../../app.component";
 
 @Component({
   moduleId: module.id,
   selector: 'add-party',
   templateUrl: 'add-party.component.html'
 })
-export class AddPartyComponent extends AdminComponent implements OnInit{
+export class AddPartyComponent extends AppComponent implements OnInit{
   private roles:string[];
   private msg:Message;
 

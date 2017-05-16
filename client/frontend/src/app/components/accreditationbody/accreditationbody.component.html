@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-md-8">
+    <h3>Accreditation Body panel</h3>
+    <div class="alert alert-warning" *ngIf="!(role && role.Role == 'AccreditationBody')">
+      <strong>You need to be an accreditationbody to view this page</strong>
+    </div>
+
+    <ul class="nav nav-tabs" *ngIf="role && role.Role == 'AccreditationBody'">
+      <li role="presentation" routerLinkActive="active"><a routerLink="create_accreditation">Create accreditation</a></li>
+      <li role="presentation" routerLinkActive="active"><a routerLink="issue_accreditation">Issue accreditation</a></li>
+      <li role="presentation" routerLinkActive="active"><a routerLink="revoke_accreditation">Revoke accreditation</a></li>
+    </ul>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>

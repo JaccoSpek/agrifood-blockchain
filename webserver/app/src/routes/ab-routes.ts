@@ -4,7 +4,7 @@ import {Member, TCert} from "hfc/lib/hfc";
 
 export class ABRoutes extends BaseChainRoute {
     public create():void {
-        //log
+        //logs
         console.log("[ABRoutes.create] Creating AccreditationBody routes.");
 
         // add signing accreditation to world-state

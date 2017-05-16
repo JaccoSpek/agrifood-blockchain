@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-md-8">
+    <h3>Farm panel</h3>
+    <div class="alert alert-warning" *ngIf="!(role && role.Role == 'Farm')">
+      <strong>You need to be a farm to view this page</strong>
+    </div>
+
+    <ul class="nav nav-tabs" *ngIf="role && role.Role == 'Farm'">
+      <li role="presentation" routerLinkActive="active"><a routerLink="create_grapes">Create grapes asset</a></li>
+      <li role="presentation" routerLinkActive="active"><a routerLink="certify_grapes">Certify grapes asset</a></li>
+      <li role="presentation" routerLinkActive="active"><a routerLink="transfer_grapes">Transfer grapes asset</a></li>
+    </ul>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>

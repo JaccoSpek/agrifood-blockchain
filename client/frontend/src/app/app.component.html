@@ -10,7 +10,12 @@
   </div>
   <hr>
   <ul class="nav nav-pills">
-    <li role="presentation" routerLinkActive="active"><a routerLink="/admin">Admin</a></li>
+    <li role="presentation" routerLinkActive="active" *ngIf="role && role.Admin"><a routerLink="/admin">Admin</a></li>
+    <li role="presentation" routerLinkActive="active" *ngIf="role && role.Role == 'AccreditationBody'"><a routerLink="/ab">AccreditationBody</a></li>
+    <li role="presentation" routerLinkActive="active" *ngIf="role && role.Role == 'CertificationBody'"><a routerLink="/cb">CertificationBody</a></li>
+    <li role="presentation" routerLinkActive="active" *ngIf="role && role.Role == 'Farm'"><a routerLink="/farm">Farm</a></li>
+    <li role="presentation" routerLinkActive="active" *ngIf="role && role.Role == 'Auditor'"><a routerLink="/auditor">Auditor</a></li>
+    <li role="presentation" routerLinkActive="active" *ngIf="role && role.Role == 'Trader'"><a routerLink="/trader">Trader</a></li>
   </ul>
   <router-outlet></router-outlet>
 </div>

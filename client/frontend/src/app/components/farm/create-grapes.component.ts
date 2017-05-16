@@ -3,8 +3,9 @@ import { AppComponent } from "../../app.component";
 
 @Component({
   moduleId: module.id,
-  selector: 'admin',
-  templateUrl: 'admin.component.html'
+  selector: 'create-grapes',
+  templateUrl: 'create-grapes.component.html'
 })
-export class AdminComponent extends AppComponent {
+export class CreateGrapesComponent extends AppComponent {
+
 }

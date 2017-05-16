@@ -21,12 +21,10 @@ export class AuthComponent implements OnInit {
   getRole():void {
     let ccID:string = this.sharedService.getValue("chaincodeID");
     if(this.enrolledId && ccID){
-      if(!this.role){
-        this.chainService.get_caller_role().then(result => {
-          this.role = result as CcRole;
-          this.sharedService.setKey("role",JSON.stringify(this.role));
-        });
-      }
+      this.chainService.get_caller_role().then(result => {
+        this.role = result as CcRole;
+        this.sharedService.setKey("role",JSON.stringify(this.role));
+      });
     }
   }
 

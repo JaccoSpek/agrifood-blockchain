@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-md-8">
+    <h3>Auditor panel</h3>
+    <div class="alert alert-warning" *ngIf="!(role && role.Role == 'Auditor')">
+      <strong>You need to be an auditor to view this page</strong>
+    </div>
+
+    <ul class="nav nav-tabs" *ngIf="role && role.Role == 'Auditor'">
+      <li role="presentation" routerLinkActive="active"><a routerLink="revoke_accreditation">Revoke accreditation</a></li>
+      <li role="presentation" routerLinkActive="active"><a routerLink="revoke_signing_authority">Revoke signing authority</a></li>
+      <li role="presentation" routerLinkActive="active"><a routerLink="revoke_signature">Revoke signature</a></li>
+    </ul>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>
