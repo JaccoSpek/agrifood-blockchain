@@ -319,7 +319,7 @@ func (t *AgrifoodChaincode) add_signing_accreditation(stub shim.ChaincodeStubInt
 		return nil, errors.New(msg)
 	}
 
-	signingAccreditation := SigningAccreditation{ID:args[0],Description:args[1],Revoked:false}
+	signingAccreditation := SigningAccreditation{ID:args[0],AccreditationBody:party.ID,Description:args[1],Revoked:false}
 	signingAccreditation.Created, err = time.Parse(time.RFC3339,args[2])
 	if err != nil {
 		msg := "Error parsing time (created date)"
@@ -1112,6 +1112,7 @@ func (t *AgrifoodChaincode) saveSigningAccreditation(stub shim.ChaincodeStubInte
 		return errors.New(msg)
 	}
 
+	myLogger.Infof(string(signing_accreditations_b[:]))
 	// save serialized signing accreditations
 	err = stub.PutState("SigningAccreditations", signing_accreditations_b)
 	if err != nil {
@@ -1208,19 +1209,23 @@ func (t *AgrifoodChaincode) addAdminCert(stub shim.ChaincodeStubInterface, cert_
 Query section
 */
 func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	myLogger.Debug("Query Chaincode...")
+	//myLogger.Debug("Query Chaincode...")
 
 	// Handle different functions
 	if function == "get_roles" {
 		return t.get_roles(stub)
 	} else if function == "get_caller_role" {
 		return t.get_caller_role(stub)
+	}  else if function == "get_role_parties" {
+		return t.get_role_parties(stub, args)
 	} else if function == "grape_ownership_trail" {
 		return t.grape_ownership_trail(stub, args)
 	}  else if function == "grape_signatures" {
 		return t.grape_signatures(stub, args)
 	} else if function == "signer_certs" {
 		return t.signer_certs(stub, args)
+	} else if function == "get_issued_accreditations" {
+		return t.get_issued_accreditations(stub, args)
 	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
@@ -1230,7 +1235,7 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 // get available roles
 func (t *AgrifoodChaincode) get_roles(stub shim.ChaincodeStubInterface) ([]byte, error) {
 	// Return available roles
-	myLogger.Info("Get roles..")
+	//myLogger.Info("Get roles..")
 
 	isAdmin, err := t.verifyAdmin(stub)
 	if err != nil {
@@ -1252,13 +1257,13 @@ func (t *AgrifoodChaincode) get_roles(stub shim.ChaincodeStubInterface) ([]byte,
 		return nil, errors.New(msg)
 	}
 
-	myLogger.Info("Return roles")
+	//myLogger.Info("Return roles")
 	return roles_b,nil
 }
 
 // return the role of a caller
 func (t *AgrifoodChaincode) get_caller_role(stub shim.ChaincodeStubInterface) ([]byte, error) {
-	myLogger.Info("get caller admin status and role")
+	//myLogger.Info("get caller admin status and role")
 
 	isAdmin, err := t.verifyAdmin(stub)
 	if err != nil {
@@ -1282,14 +1287,48 @@ func (t *AgrifoodChaincode) get_caller_role(stub shim.ChaincodeStubInterface) ([
 		return nil, errors.New(msg)
 	}
 
-	myLogger.Infof("Caller role: %s",string(role_b[:]))
+	//myLogger.Infof("Caller role: %s",string(role_b[:]))
 	return role_b,nil
+}
+
+// return all parties of a role
+func (t *AgrifoodChaincode) get_role_parties(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 1" // farmID
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	parties, err := t.getParties(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving parties: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	var role_parties []string
+	for _,party := range parties {
+		if party.Role == args[0] {
+			role_parties = append(role_parties,party.ID)
+		}
+	}
+
+	role_parties_b, err := json.Marshal(role_parties)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling role_parties: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	return role_parties_b, nil
 }
 
 // return grape provenance
 func (t *AgrifoodChaincode) grape_ownership_trail(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	// public query function to check ownership trail of grapes
-	myLogger.Info("Get ownership trail of grapes..")
+	//myLogger.Info("Get ownership trail of grapes..")
 
 	// Check number of arguments
 	if len(args) != 1 {
@@ -1314,14 +1353,14 @@ func (t *AgrifoodChaincode) grape_ownership_trail(stub shim.ChaincodeStubInterfa
 		return nil, errors.New(msg)
 	}
 
-	myLogger.Info("Return provenance")
+	//myLogger.Info("Return provenance")
 	return grapes_ownership_b, nil
 }
 
 // return grape certification
 func (t *AgrifoodChaincode) grape_signatures(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	// public query function to check accreditation of grapes
-	myLogger.Info("Get accreditation of grapes..")
+	//myLogger.Info("Get accreditation of grapes..")
 
 	// Check number of arguments
 	if len(args) != 1 {
@@ -1346,14 +1385,14 @@ func (t *AgrifoodChaincode) grape_signatures(stub shim.ChaincodeStubInterface, a
 		return nil, errors.New(msg)
 	}
 
-	myLogger.Info("Return signatures")
+	//myLogger.Info("Return signatures")
 	return grapes_signatures_b,nil
 }
 
 // return signing authorizations of party for certificate
 func (t *AgrifoodChaincode) signer_certs(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	// public query function to return signing authorizations of a farm
-	myLogger.Info("Get signing authorizations of a farm..")
+	//myLogger.Info("Get signing authorizations of a farm..")
 
 	// Check number of arguments
 	if len(args) != 1 {
@@ -1393,6 +1432,54 @@ func (t *AgrifoodChaincode) signer_certs(stub shim.ChaincodeStubInterface, args 
 	}
 
 	return party_auths_b, nil
+}
+
+// return all issued accreditations of party
+func (t *AgrifoodChaincode) get_issued_accreditations(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 1" // party
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	party, err := t.getParty(stub, args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	if party.Role != t.roles[0] {
+		msg := fmt.Sprintf("Supplied party is no AccreditationBody: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Find accreditations issued by %s", party.ID)
+	accreditations, err := t.getSigningAccreditations(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving accreditations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	var party_accreditations []SigningAccreditation
+	for _,accr := range accreditations {
+		if accr.AccreditationBody == party.ID && !accr.Revoked {
+			party_accreditations = append(party_accreditations,accr)
+		}
+	}
+
+	party_accreditations_b, err := json.Marshal(party_accreditations)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling party_accreditations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Accreditations from party: %s",string(party_accreditations_b[:]))
+	return party_accreditations_b, nil
 }
 
 // get specific grape unit

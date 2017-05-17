@@ -1,3 +1,25 @@
 <div *ngIf="role && role.Role == 'AccreditationBody'">
-  <h3>Create accreditation</h3>
+  <h4>Create accreditation</h4>
+  <div class="alert" [ngClass]="msg.level" *ngIf="msg">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <div class="form-group">
+    <label for="accreditationID">Accreditation ID:</label>
+    <input type="text" class="form-control" id="accreditationID" [(ngModel)]="accreditationID">
+  </div>
+  <div class="form-group">
+    <label for="description">Description:</label>
+    <textarea class="form-control" rows="5" id="description" [(ngModel)]="description"></textarea>
+  </div>
+  <div class="form-group">
+    <label for="created_date">Created date:</label>
+    <input type="text" class="form-control" id="created_date" [(ngModel)]="created_date">
+  </div>
+  <div class="form-group">
+    <label for="expiration_date">Expiration date:</label>
+    <input type="text" class="form-control" id="expiration_date" [(ngModel)]="expiration_date">
+  </div>
+  <div class="form-group">
+    <button type="button" class="btn btn-success" (click)="createAccreditation(accreditationID,description,created_date,expiration_date)">Create accreditation</button>
+  </div>
 </div>

@@ -55,7 +55,8 @@ export abstract class BaseChainRoute {
                 let validRequest:boolean = true;
                 for(let param of requiredParams){
                     if (typeof req.body[param] === 'undefined') {
-                        validRequest = false
+                        validRequest = false;
+                        console.log(param,"not found")
                     }
                 }
 
@@ -170,8 +171,7 @@ export abstract class BaseChainRoute {
             userCert: tcert
         };
 
-        console.log("Querying function %s on %s",fcn,chaincodeID);
-        console.log(args);
+        //console.log("Querying function %s on %s",fcn,chaincodeID);
 
         let tx:TransactionContext = user.newTransactionContext();
         tx.setAttrs(['role']);
@@ -180,7 +180,7 @@ export abstract class BaseChainRoute {
         // listen for events
         tx.on('complete', function(data){
             let result = data.result.toString();
-            console.log("Query completed successfully; results=%s", result);
+            //console.log("Query completed successfully; results=%s", result);
             cb(null,result);
         });
 

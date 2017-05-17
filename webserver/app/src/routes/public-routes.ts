@@ -27,6 +27,15 @@ export class PublicRoutes extends BaseChainRoute {
             this.get_caller_role(req,res);
         });
 
+        // get caller role
+        this.router.get("/role_parties/:role", (req:Request, res:Response) => {
+            this.get_role_parties(req,res);
+        });
+
+        // get issued accreditations
+        this.router.get("/get_issued_accreditations/:party", (req:Request, res:Response) => {
+            this.get_issued_accreditations(req,res);
+        });
     }
 
     private grape_ownership_trail(req:Request, res:Response):void {
@@ -97,6 +106,46 @@ export class PublicRoutes extends BaseChainRoute {
             } else {
                 let args = [];
                 this.queryChaincode(ccID,"get_caller_role",args,user,tcert,(err:Error, result:any)=>{
+                    if(err) {
+                        console.log("Error: %s",err.message);
+                        res.status(400).send(err.message);
+                    } else {
+                        console.log("Queried results: %s", result);
+                        res.type('json').send(result);
+                    }
+                });
+            }
+        });
+    }
+
+    private get_role_parties(req:Request, res:Response):void {
+        this.verifyQueryRequest(req,['role'],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+            if(err){
+                console.log("Error: %s",err.message);
+                res.status(400).send(err.message);
+            } else {
+                let args = [req.params['role']];
+                this.queryChaincode(ccID,"get_role_parties",args,user,tcert,(err:Error, result:any)=>{
+                    if(err) {
+                        console.log("Error: %s",err.message);
+                        res.status(400).send(err.message);
+                    } else {
+                        console.log("Queried results: %s", result);
+                        res.type('json').send(result);
+                    }
+                });
+            }
+        });
+    }
+
+    private get_issued_accreditations(req:Request, res:Response):void {
+        this.verifyQueryRequest(req,['party'],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+            if(err){
+                console.log("Error: %s",err.message);
+                res.status(400).send(err.message);
+            } else {
+                let args = [req.params['party']];
+                this.queryChaincode(ccID,"get_issued_accreditations",args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message);

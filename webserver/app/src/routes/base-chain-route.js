@@ -50,6 +50,7 @@ var BaseChainRoute = (function () {
                     var param = requiredParams_1[_i];
                     if (typeof req.body[param] === 'undefined') {
                         validRequest = false;
+                        console.log(param, "not found");
                     }
                 }
                 if (!validRequest) {
@@ -153,15 +154,14 @@ var BaseChainRoute = (function () {
             args: args,
             userCert: tcert
         };
-        console.log("Querying function %s on %s", fcn, chaincodeID);
-        console.log(args);
+        //console.log("Querying function %s on %s",fcn,chaincodeID);
         var tx = user.newTransactionContext();
         tx.setAttrs(['role']);
         tx.query(queryRequest);
         // listen for events
         tx.on('complete', function (data) {
             var result = data.result.toString();
-            console.log("Query completed successfully; results=%s", result);
+            //console.log("Query completed successfully; results=%s", result);
             cb(null, result);
         });
         tx.on('error', function (error) {

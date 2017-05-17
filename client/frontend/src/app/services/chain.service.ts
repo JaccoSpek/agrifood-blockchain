@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Headers, Http, RequestOptions} from '@angular/http';
-import { CcRole } from '../types';
+import {Accreditation, CcRole} from '../types';
 import 'rxjs/add/operator/toPromise';
 import { API_URL } from '../config';
 
@@ -95,6 +95,40 @@ export class ChainService {
     return this.http.post(url,args,this.opts)
       .toPromise()
       .then(response => response.text() as string)
+      .catch(ChainService.handleError)
+  }
+
+  add_signing_accreditation(id:string,description:string,created:string,expires:string): Promise<string> { //"id","description","created_date","expiration_date"
+    let url = `${this.apiURL}/ab/add_signing_accreditation`;
+
+    let args:any = {
+      id:id,
+      description:description,
+      created_date:created,
+      expiration_date:expires
+    };
+
+    return this.http.post(url,JSON.stringify(args),this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError)
+  }
+
+  get_role_parties(role:string): Promise<string[]> {
+    let url = `${this.apiURL}/role_parties/${role}`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as any)
+      .catch(ChainService.handleError)
+  }
+
+  get_party_accreditations(party:string): Promise<Accreditation[]> {
+    let url = `${this.apiURL}/get_issued_accreditations/${party}`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as Accreditation[])
       .catch(ChainService.handleError)
   }
 
