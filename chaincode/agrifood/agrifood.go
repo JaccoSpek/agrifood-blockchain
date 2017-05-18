@@ -1563,6 +1563,7 @@ func (t *AgrifoodChaincode) getSigningAuthorizations(stub shim.ChaincodeStubInte
 // get specific signing accreditation
 func (t *AgrifoodChaincode) getSigningAccreditation(stub shim.ChaincodeStubInterface, certID string) (SigningAccreditation, error) {
 	accreditations, err := t.getSigningAccreditations(stub)
+
 	if err != nil {
 		msg := fmt.Sprintf("Error retreiving accreditations: %s", err)
 		myLogger.Error(msg)
@@ -1575,7 +1576,8 @@ func (t *AgrifoodChaincode) getSigningAccreditation(stub shim.ChaincodeStubInter
 		}
 	}
 
-	return SigningAccreditation{}, errors.New("Unable to determine SigningAccreditation")
+	msg := fmt.Sprintf("Unable to determine SigningAccreditation: %s", certID)
+	return SigningAccreditation{}, errors.New(msg)
 }
 
 // get all signing accreditations

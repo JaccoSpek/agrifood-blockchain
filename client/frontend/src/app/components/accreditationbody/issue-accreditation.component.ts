@@ -2,6 +2,7 @@ import {Component, OnInit}    from '@angular/core';
 import { AppComponent } from "../../app.component";
 import {SharedService} from "../../services/shared.service";
 import {ChainService} from "../../services/chain.service";
+import {Accreditation, Message} from '../../types';
 
 @Component({
   moduleId: module.id,
@@ -9,7 +10,9 @@ import {ChainService} from "../../services/chain.service";
   templateUrl: 'issue-accreditation.component.html'
 })
 export class IssueAccreditationComponent extends AppComponent implements OnInit {
-  cert_bodies:string[];
+  private cert_bodies:string[];
+  private accreditations:Accreditation[];
+  private msg:Message;
 
   constructor(private sharedSrv:SharedService,private chainService:ChainService) {
     super(sharedSrv);
@@ -24,10 +27,21 @@ export class IssueAccreditationComponent extends AppComponent implements OnInit 
       console.log(this.cert_bodies);
     });
 
-    // cet issued accreditations
+    // get issued accreditations
     let id:string = this.sharedSrv.getValue("enrolledId");
     this.chainService.get_party_accreditations(id).then(result => {
+      this.accreditations = result as Accreditation[];
+      console.log(this.accreditations);
+    });
+  }
+
+  issue_accreditation(accreditation:string,cb:string):void {
+    this.msg = {text:"Issue accreditation..",level:"alert-info"};
+    this.chainService.issue_accreditation(accreditation,cb).then(result => {
       console.log(result);
+      this.msg = {text:result,level:"alert-success"};
+    }).catch(reason => {
+      this.msg = {text:reason.toString(),level:"alert-danger"};
     });
   }
 }

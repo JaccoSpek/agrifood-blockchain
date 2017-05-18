@@ -132,6 +132,20 @@ export class ChainService {
       .catch(ChainService.handleError)
   }
 
+  issue_accreditation(accreditation:string,cert_body:string): Promise<string> {
+    let url = `${this.apiURL}/ab/issue_signing_accreditation`;
+
+    let args = {
+      accr_id: accreditation,
+      cb: cert_body
+    };
+
+    return this.http.post(url,args,this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError)
+  }
+
   private static handleError(error: any): Promise<any> {
     console.error('An error occurred', error);
     return Promise.reject(error.message || error);

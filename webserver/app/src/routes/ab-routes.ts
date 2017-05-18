@@ -46,12 +46,12 @@ export class ABRoutes extends BaseChainRoute {
     }
 
     private issue_signing_accreditation(req:Request, res:Response):void {
-        this.verifyRequest(req,["cid","cb"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+        this.verifyRequest(req,["accr_id","cb"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
             if(err) {
                 console.log("Error: %s",err.message);
                 res.status(400).send(err.message)
             } else {
-                let args = [req.body['cid'],req.body['cb']];
+                let args = [req.body['accr_id'],req.body['cb']];
                 this.invokeChaincode(ccID,'issue_signing_accreditation',args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
