@@ -32,9 +32,9 @@ export class PublicRoutes extends BaseChainRoute {
             this.get_role_parties(req,res);
         });
 
-        // get issued accreditations
-        this.router.get("/get_issued_accreditations/:party", (req:Request, res:Response) => {
-            this.get_issued_accreditations(req,res);
+        // get party accreditations
+        this.router.get("/get_party_accreditations/:party", (req:Request, res:Response) => {
+            this.get_party_accreditations(req,res);
         });
     }
 
@@ -138,14 +138,14 @@ export class PublicRoutes extends BaseChainRoute {
         });
     }
 
-    private get_issued_accreditations(req:Request, res:Response):void {
+    private get_party_accreditations(req:Request, res:Response):void {
         this.verifyQueryRequest(req,['party'],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
             if(err){
                 console.log("Error: %s",err.message);
                 res.status(400).send(err.message);
             } else {
                 let args = [req.params['party']];
-                this.queryChaincode(ccID,"get_issued_accreditations",args,user,tcert,(err:Error, result:any)=>{
+                this.queryChaincode(ccID,"get_party_accreditations",args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message);

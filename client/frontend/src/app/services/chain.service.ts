@@ -75,7 +75,7 @@ export class ChainService {
     return this.http.get(url, this.opts)
       .toPromise()
       .then(response => response.json() as CcRole)
-      .catch(ChainService.handleError)
+      .catch(ChainService.handleError);
   }
 
   get_roles(): Promise<string[]> {
@@ -84,7 +84,7 @@ export class ChainService {
     return this.http.get(url, this.opts)
       .toPromise()
       .then(response => response.json() as string[])
-      .catch(ChainService.handleError)
+      .catch(ChainService.handleError);
   }
 
   add_party(id:string,role:string): Promise<string> {
@@ -95,7 +95,7 @@ export class ChainService {
     return this.http.post(url,args,this.opts)
       .toPromise()
       .then(response => response.text() as string)
-      .catch(ChainService.handleError)
+      .catch(ChainService.handleError);
   }
 
   add_signing_accreditation(id:string,description:string,created:string,expires:string): Promise<string> { //"id","description","created_date","expiration_date"
@@ -111,7 +111,7 @@ export class ChainService {
     return this.http.post(url,JSON.stringify(args),this.opts)
       .toPromise()
       .then(response => response.text() as string)
-      .catch(ChainService.handleError)
+      .catch(ChainService.handleError);
   }
 
   get_role_parties(role:string): Promise<string[]> {
@@ -120,16 +120,16 @@ export class ChainService {
     return this.http.get(url,this.opts)
       .toPromise()
       .then(response => response.json() as any)
-      .catch(ChainService.handleError)
+      .catch(ChainService.handleError);
   }
 
   get_party_accreditations(party:string): Promise<Accreditation[]> {
-    let url = `${this.apiURL}/get_issued_accreditations/${party}`;
+    let url = `${this.apiURL}/get_party_accreditations/${party}`;
 
     return this.http.get(url,this.opts)
       .toPromise()
       .then(response => response.json() as Accreditation[])
-      .catch(ChainService.handleError)
+      .catch(ChainService.handleError);
   }
 
   issue_accreditation(accreditation:string,cert_body:string): Promise<string> {
@@ -143,7 +143,21 @@ export class ChainService {
     return this.http.post(url,args,this.opts)
       .toPromise()
       .then(response => response.text() as string)
-      .catch(ChainService.handleError)
+      .catch(ChainService.handleError);
+  }
+
+  revoke_accreditation(accreditationID:string,timestamp:string): Promise<string> {
+    let url = `${this.apiURL}/ab/revoke_signing_accreditation`;
+
+    let args = {
+      accr_id:accreditationID,
+      timestamp:timestamp
+    };
+
+    return this.http.post(url,args,this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError);
   }
 
   private static handleError(error: any): Promise<any> {

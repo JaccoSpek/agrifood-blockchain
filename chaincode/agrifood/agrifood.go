@@ -442,8 +442,8 @@ func (t *AgrifoodChaincode) revoke_signing_accreditation(stub shim.ChaincodeStub
 	myLogger.Debugf("Received party: %s, role:%s", party.ID, party.Role)
 
 	// check if caller is a AccreditationBody or auditor
-	if party.Role != t.roles[0] || party.Role != t.roles[3] {
-		msg := "Caller is not an AccreditationBody"
+	if party.Role != t.roles[0] && party.Role != t.roles[3] {
+		msg := "Caller is not an AccreditationBody or Auditor"
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -1224,8 +1224,8 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.grape_signatures(stub, args)
 	} else if function == "signer_certs" {
 		return t.signer_certs(stub, args)
-	} else if function == "get_issued_accreditations" {
-		return t.get_issued_accreditations(stub, args)
+	} else if function == "get_party_accreditations" {
+		return t.get_party_accreditations(stub, args)
 	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
@@ -1434,8 +1434,8 @@ func (t *AgrifoodChaincode) signer_certs(stub shim.ChaincodeStubInterface, args 
 	return party_auths_b, nil
 }
 
-// return all issued accreditations of party
-func (t *AgrifoodChaincode) get_issued_accreditations(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+// return all created accreditations of party
+func (t *AgrifoodChaincode) get_party_accreditations(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	// Check number of arguments
 	if len(args) != 1 {
 		msg := "Incorrect number of arguments. Expecting 1" // party
@@ -1456,7 +1456,7 @@ func (t *AgrifoodChaincode) get_issued_accreditations(stub shim.ChaincodeStubInt
 		return nil, errors.New(msg)
 	}
 
-	myLogger.Infof("Find accreditations issued by %s", party.ID)
+	myLogger.Infof("Find accreditations created by %s", party.ID)
 	accreditations, err := t.getSigningAccreditations(stub)
 	if err != nil {
 		msg := fmt.Sprintf("Error retrieving accreditations: %s", err)

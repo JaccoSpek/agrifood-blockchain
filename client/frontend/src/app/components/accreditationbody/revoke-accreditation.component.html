@@ -1,3 +1,19 @@
 <div *ngIf="role && role.Role == 'AccreditationBody'">
-  <h3>Revoke accreditation</h3>
+  <h4>Revoke accreditation</h4>
+  <div class="alert" [ngClass]="msg.level" *ngIf="msg">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <div class="form-group">
+    <label for="accreditation">Accreditation:</label>
+    <select id="accreditation" class="form-control" [(ngModel)]="selectedAccreditation">
+      <option *ngFor="let accreditation of accreditations" [value]="accreditation.ID">{{accreditation.ID}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="revocation_timestamp">Created date:</label>
+    <input type="text" class="form-control" id="revocation_timestamp" [(ngModel)]="revocation_timestamp">
+  </div>
+  <div class="form-group">
+    <button type="button" class="btn btn-danger" (click)="revoke_accreditation(selectedAccreditation,revocation_timestamp)">Revoke accreditation</button>
+  </div>
 </div>

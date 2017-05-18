@@ -27,7 +27,7 @@ export class IssueAccreditationComponent extends AppComponent implements OnInit 
       console.log(this.cert_bodies);
     });
 
-    // get issued accreditations
+    // get created accreditations
     let id:string = this.sharedSrv.getValue("enrolledId");
     this.chainService.get_party_accreditations(id).then(result => {
       this.accreditations = result as Accreditation[];
