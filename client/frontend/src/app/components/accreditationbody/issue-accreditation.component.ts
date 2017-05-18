@@ -24,14 +24,12 @@ export class IssueAccreditationComponent extends AppComponent implements OnInit 
     // get certification bodies
     this.chainService.get_role_parties("CertificationBody").then(result =>{
       this.cert_bodies = result as string[];
-      console.log(this.cert_bodies);
     });
 
     // get created accreditations
     let id:string = this.sharedSrv.getValue("enrolledId");
     this.chainService.get_party_accreditations(id).then(result => {
       this.accreditations = result as Accreditation[];
-      console.log(this.accreditations);
     });
   }
 

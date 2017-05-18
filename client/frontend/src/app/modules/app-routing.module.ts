@@ -7,6 +7,7 @@ import { AccreditationbodyComponent } from '../components/accreditationbody/accr
 import { CreateAccreditationComponent } from '../components/accreditationbody/create-accreditation.component';
 import { IssueAccreditationComponent } from '../components/accreditationbody/issue-accreditation.component';
 import { RevokeAccreditationComponent } from '../components/accreditationbody/revoke-accreditation.component';
+import { AccreditationsOverviewComponent } from '../components/accreditationbody/accreditations-overview.component';
 import { CertificationbodyComponent } from '../components/certificationbody/certificationbody.component';
 import { GrantSigningAuthorityComponent } from '../components/certificationbody/grant-signing-authority.component';
 import { RevokeSigningAuthorityComponent } from '../components/certificationbody/revoke-signing-authority.component';
@@ -33,7 +34,8 @@ const routes: Routes = [
   { path: 'ab', component: AccreditationbodyComponent, children: [
     { path: 'create_accreditation', component:CreateAccreditationComponent },
     { path: 'issue_accreditation', component:IssueAccreditationComponent },
-    { path: 'revoke_accreditation', component:RevokeAccreditationComponent }
+    { path: 'revoke_accreditation', component:RevokeAccreditationComponent },
+    { path: 'accreditations_overview', component:AccreditationsOverviewComponent }
   ]},
   { path: 'cb', component: CertificationbodyComponent, children: [
     { path: 'grant_signing_authority', component:GrantSigningAuthorityComponent },

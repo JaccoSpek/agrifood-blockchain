@@ -1466,7 +1466,7 @@ func (t *AgrifoodChaincode) get_party_accreditations(stub shim.ChaincodeStubInte
 
 	var party_accreditations []SigningAccreditation
 	for _,accr := range accreditations {
-		if accr.AccreditationBody == party.ID && !accr.Revoked {
+		if accr.AccreditationBody == party.ID {
 			party_accreditations = append(party_accreditations,accr)
 		}
 	}

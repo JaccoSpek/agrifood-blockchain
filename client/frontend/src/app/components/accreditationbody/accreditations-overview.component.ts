@@ -6,13 +6,11 @@ import {ChainService} from "../../services/chain.service";
 
 @Component({
   moduleId: module.id,
-  selector: 'revoke-accreditation',
-  templateUrl: 'revoke-accreditation.component.html'
+  selector: 'accreditations-overview',
+  templateUrl: 'accreditations-overview.component.html'
 })
-export class RevokeAccreditationComponent extends AppComponent implements OnInit{
+export class AccreditationsOverviewComponent extends AppComponent implements OnInit{
   private accreditations:Accreditation[];
-  private revocation_timestamp:string;
-  private msg:Message;
 
   constructor(private sharedSrv:SharedService,private chainService:ChainService) {
     super(sharedSrv);
@@ -21,23 +19,10 @@ export class RevokeAccreditationComponent extends AppComponent implements OnInit
   ngOnInit():void {
     super.ngOnInit();
 
-    let now:Date = new Date();
-    this.revocation_timestamp = now.toISOString();
-
     // get created accreditations
     let id:string = this.sharedSrv.getValue("enrolledId");
     this.chainService.get_party_accreditations(id).then(result => {
       this.accreditations = result as Accreditation[];
-    });
-  }
-
-  revoke_accreditation(accreditationID:string,timestamp:string):void {
-    this.msg = {text:"Revoking accreditation..",level:"alert-info"};
-    this.chainService.revoke_accreditation(accreditationID,timestamp).then(result => {
-      console.log(result);
-      this.msg = {text:result,level:"alert-success"};
-    }).catch(reason => {
-      this.msg = {text:reason.toString(),level:"alert-danger"};
     });
   }
 }

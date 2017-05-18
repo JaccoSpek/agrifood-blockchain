@@ -33,6 +33,7 @@ import {PublicComponent} from "./components/public/public.component";
 import {GrapeOwnerShipTrailComponent} from "./components/public/grape-ownership-trail.component";
 import {GrapeSignaturesComponent} from "./components/public/grape-signatures.component";
 import {SignerCertsComponent} from "./components/public/signer-certs.component";
+import {AccreditationsOverviewComponent} from "./components/accreditationbody/accreditations-overview.component";
 
 @NgModule({
   imports:      [ BrowserModule, HttpModule, FormsModule, AppRoutingModule ],
@@ -46,6 +47,7 @@ import {SignerCertsComponent} from "./components/public/signer-certs.component";
     CreateAccreditationComponent,
     IssueAccreditationComponent,
     RevokeAccreditationComponent,
+    AccreditationsOverviewComponent,
     CertificationbodyComponent,
     GrantSigningAuthorityComponent,
     RevokeSigningAuthorityComponent,
