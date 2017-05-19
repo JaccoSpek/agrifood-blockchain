@@ -18,18 +18,18 @@ export class IssueAccreditationComponent extends AppComponent implements OnInit 
     super(sharedSrv);
   };
 
-  ngOnInit():void {
-    super.ngOnInit();
-
+  OnInitialized():void {
     // get certification bodies
     this.chainService.get_role_parties("CertificationBody").then(result =>{
       this.cert_bodies = result as string[];
     });
 
     // get created accreditations
-    let id:string = this.sharedSrv.getValue("enrolledId");
-    this.chainService.get_party_accreditations(id).then(result => {
+    this.chainService.get_party_accreditations(this.enrolledId).then(result => {
       this.accreditations = result as Accreditation[];
+      if(!this.accreditations || (this.accreditations && this.accreditations.length == 0)) {
+        this.msg = {text:"No accreditations found", level:"alert-info"}
+      }
     });
   }
 

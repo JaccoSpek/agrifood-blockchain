@@ -11,18 +11,20 @@ import {ChainService} from "../../services/chain.service";
 })
 export class AccreditationsOverviewComponent extends AppComponent implements OnInit{
   private accreditations:Accreditation[];
+  private msg:Message;
 
   constructor(private sharedSrv:SharedService,private chainService:ChainService) {
     super(sharedSrv);
   };
 
-  ngOnInit():void {
-    super.ngOnInit();
-
+  OnInitialized():void {
     // get created accreditations
-    let id:string = this.sharedSrv.getValue("enrolledId");
-    this.chainService.get_party_accreditations(id).then(result => {
+    this.chainService.get_party_accreditations(this.enrolledId).then(result => {
       this.accreditations = result as Accreditation[];
+      if(!this.accreditations || (this.accreditations && this.accreditations.length == 0)) {
+        this.msg = {text:"No accreditations found", level:"alert-info"}
+      }
     });
   }
+
 }

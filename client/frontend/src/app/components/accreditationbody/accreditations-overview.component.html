@@ -3,7 +3,7 @@
   <div class="alert" [ngClass]="msg.level" *ngIf="msg">
     <strong>{{msg.text}}</strong>
   </div>
-  <table class="table table-bordered">
+  <table class="table table-bordered" *ngIf="accreditations && accreditations.length > 0">
     <thead>
       <tr>
         <th>ID</th>
