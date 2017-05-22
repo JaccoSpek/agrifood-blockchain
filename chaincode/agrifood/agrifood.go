@@ -396,6 +396,12 @@ func (t *AgrifoodChaincode) issue_signing_accreditation(stub shim.ChaincodeStubI
 		return nil, errors.New(msg)
 	}
 
+	if accreditation.Revoked {
+		msg := fmt.Sprintf("Error: Accreditation is revoked at %s",accreditation.RevocationTimestamp)
+		myLogger.Warning(msg)
+		return nil, errors.New(msg)
+	}
+
 	// get party
 	certBody, err := t.getParty(stub,args[1])
 	if err != nil {

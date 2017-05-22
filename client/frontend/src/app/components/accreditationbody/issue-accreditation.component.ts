@@ -26,7 +26,12 @@ export class IssueAccreditationComponent extends AppComponent implements OnInit 
 
     // get created accreditations
     this.chainService.get_party_accreditations(this.enrolledId).then(result => {
-      this.accreditations = result as Accreditation[];
+      let accreditations:Accreditation[] = result as Accreditation[];
+
+      this.accreditations = accreditations.filter(
+        accr => accr.Revoked == false && !accr.CertificationBody
+      );
+
       if(!this.accreditations || (this.accreditations && this.accreditations.length == 0)) {
         this.msg = {text:"No accreditations found", level:"alert-info"}
       }
