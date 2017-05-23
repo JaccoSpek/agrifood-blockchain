@@ -1118,7 +1118,6 @@ func (t *AgrifoodChaincode) saveSigningAccreditation(stub shim.ChaincodeStubInte
 		return errors.New(msg)
 	}
 
-	myLogger.Infof(string(signing_accreditations_b[:]))
 	// save serialized signing accreditations
 	err = stub.PutState("SigningAccreditations", signing_accreditations_b)
 	if err != nil {
@@ -1232,6 +1231,8 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.signer_certs(stub, args)
 	} else if function == "get_party_accreditations" {
 		return t.get_party_accreditations(stub, args)
+	} else if function == "get_issued_accreditations" {
+		return t.get_issued_accreditations(stub, args)
 	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
@@ -1463,6 +1464,7 @@ func (t *AgrifoodChaincode) get_party_accreditations(stub shim.ChaincodeStubInte
 	}
 
 	myLogger.Infof("Find accreditations created by %s", party.ID)
+
 	accreditations, err := t.getSigningAccreditations(stub)
 	if err != nil {
 		msg := fmt.Sprintf("Error retrieving accreditations: %s", err)
@@ -1485,6 +1487,55 @@ func (t *AgrifoodChaincode) get_party_accreditations(stub shim.ChaincodeStubInte
 	}
 
 	myLogger.Infof("Accreditations from party: %s",string(party_accreditations_b[:]))
+	return party_accreditations_b, nil
+}
+
+// return all accreditations issued to party
+func (t *AgrifoodChaincode) get_issued_accreditations(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 1" // party
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	party, err := t.getParty(stub, args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	if party.Role != t.roles[1] {
+		msg := fmt.Sprintf("Supplied party is no CertificationBody: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Find accreditations issued to %s", party.ID)
+
+	accreditations, err := t.getSigningAccreditations(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving accreditations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	var issued_accreditations []SigningAccreditation
+	for _,accr := range accreditations {
+		if accr.CertificationBody == party.ID {
+			issued_accreditations = append(issued_accreditations,accr)
+		}
+	}
+
+	party_accreditations_b, err := json.Marshal(issued_accreditations)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling party_accreditations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Accreditations issued to %s: %s",party.ID,string(party_accreditations_b[:]))
 	return party_accreditations_b, nil
 }
 

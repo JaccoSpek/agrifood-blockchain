@@ -11,6 +11,7 @@ import { AccreditationsOverviewComponent } from '../components/accreditationbody
 import { CertificationbodyComponent } from '../components/certificationbody/certificationbody.component';
 import { GrantSigningAuthorityComponent } from '../components/certificationbody/grant-signing-authority.component';
 import { RevokeSigningAuthorityComponent } from '../components/certificationbody/revoke-signing-authority.component';
+import { IssuedAccreditationsComponent } from '../components/certificationbody/issued-accreditations.component';
 import { FarmComponent } from '../components/farm/farm.component';
 import { CreateGrapesComponent } from '../components/farm/create-grapes.component';
 import { CertifyGrapesComponent } from '../components/farm/certify-grapes.component';
@@ -38,6 +39,7 @@ const routes: Routes = [
     { path: 'accreditations_overview', component:AccreditationsOverviewComponent }
   ]},
   { path: 'cb', component: CertificationbodyComponent, children: [
+    { path: 'issued_accreditations', component:IssuedAccreditationsComponent },
     { path: 'grant_signing_authority', component:GrantSigningAuthorityComponent },
     { path: 'revoke_signing_authority', component:RevokeSigningAuthorityComponent }
   ]},

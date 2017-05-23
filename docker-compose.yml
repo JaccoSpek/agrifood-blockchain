@@ -13,6 +13,8 @@ services:
       - MEMBERSRVC_ADDRESS=membersrvc:7054
       - CCPATH=tno.nl/chaincode/agrifood
       - FRONTEND_ORIGIN=http://bctb1.sensorlab.tno.nl:3000
+      - DEPLOY_WAITTIME=30
+      - INVOKE_WAITTIME=10
     volumes:
       # Chaincode volume
       - ./chaincode:/go/src/tno.nl/chaincode

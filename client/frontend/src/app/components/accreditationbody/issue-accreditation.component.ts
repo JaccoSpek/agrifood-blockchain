@@ -1,4 +1,4 @@
-import {Component, OnInit}    from '@angular/core';
+import {Component }    from '@angular/core';
 import { AppComponent } from "../../app.component";
 import {SharedService} from "../../services/shared.service";
 import {ChainService} from "../../services/chain.service";
@@ -9,7 +9,7 @@ import {Accreditation, Message} from '../../types';
   selector: 'issue-accreditation',
   templateUrl: 'issue-accreditation.component.html'
 })
-export class IssueAccreditationComponent extends AppComponent implements OnInit {
+export class IssueAccreditationComponent extends AppComponent {
   private cert_bodies:string[];
   private accreditations:Accreditation[];
   private msg:Message;

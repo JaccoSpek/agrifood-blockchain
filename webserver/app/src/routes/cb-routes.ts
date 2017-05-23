@@ -20,12 +20,12 @@ export class CBRoutes extends BaseChainRoute {
     }
 
     private grant_signing_authority(req:Request, res:Response):void {
-        this.verifyRequest(req,["cid","party","expiration_date"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+        this.verifyRequest(req,["accr_id","farm","expiration_date"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
             if(err) {
                 console.log("Error: %s",err.message);
                 res.status(400).send(err.message)
             } else {
-                let args = [req.body['cid'],req.body['party'],req.body['expiration_date']];
+                let args = [req.body['accr_id'],req.body['farm'],req.body['expiration_date']];
                 this.invokeChaincode(ccID,'grant_signing_authority',args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);

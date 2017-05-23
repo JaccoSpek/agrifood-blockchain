@@ -1,4 +1,4 @@
-import {Component, OnInit}    from '@angular/core';
+import {Component}    from '@angular/core';
 import { AppComponent } from "../../app.component";
 import {Accreditation, Message} from "../../types";
 import {SharedService} from "../../services/shared.service";
@@ -9,7 +9,7 @@ import {ChainService} from "../../services/chain.service";
   selector: 'revoke-accreditation',
   templateUrl: 'revoke-accreditation.component.html'
 })
-export class RevokeAccreditationComponent extends AppComponent implements OnInit{
+export class RevokeAccreditationComponent extends AppComponent {
   private accreditations:Accreditation[];
   private revocation_timestamp:string;
   private msg:Message;

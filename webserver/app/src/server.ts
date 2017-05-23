@@ -92,8 +92,8 @@ export class Server {
         this.chain.setMemberServicesUrl("grpc://"+MEMBERSRVC_ADDRESS);
         this.chain.addPeer("grpc://"+PEER_ADDRESS);
         this.chain.setDevMode(false);
-        this.chain.setDeployWaitTime(30);
-        this.chain.setInvokeWaitTime(10);
+        this.chain.setDeployWaitTime(Number(process.env.DEPLOY_WAITTIME || 30));
+        this.chain.setInvokeWaitTime(Number(process.env.INVOKE_WAITTIME || 10));
         this.chain.setKeyValStore( hfc.newFileKeyValStore('/tmp/keyValStore') );
     }
 

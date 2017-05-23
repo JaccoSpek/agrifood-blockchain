@@ -1,3 +1,25 @@
 <div *ngIf="role && role.Role == 'CertificationBody'">
-  <h3>Grant singing authority</h3>
+  <h4>Grant singing authority</h4>
+  <div class="alert" [ngClass]="msg.level" *ngIf="msg">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <div class="form-group" *ngIf="accreditations">
+    <label for="accreditation">Accreditation:</label>
+    <select id="accreditation" class="form-control" [(ngModel)]="selectedAccreditation">
+      <option *ngFor="let accreditation of accreditations" [value]="accreditation.ID">{{accreditation.ID}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="cb">Farm:</label>
+    <select id="cb" class="form-control" [(ngModel)]="selectedFarm">
+      <option *ngFor="let farm of farms" [value]="farm">{{farm}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="expiration_date">Expiration date:</label>
+    <input type="text" class="form-control" id="expiration_date" [(ngModel)]="expiration_date">
+  </div>
+  <div class="form-group">
+    <button type="button" class="btn btn-success" (click)="grant_signing_authority(selectedAccreditation,selectedFarm,expiration_date)">Grant signing authority to farm</button>
+  </div>
 </div>

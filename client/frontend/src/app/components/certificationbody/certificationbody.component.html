@@ -6,6 +6,7 @@
     </div>
 
     <ul class="nav nav-tabs" *ngIf="role && role.Role == 'CertificationBody'">
+      <li role="presentation" routerLinkActive="active"><a routerLink="issued_accreditations">Issued accreditations</a></li>
       <li role="presentation" routerLinkActive="active"><a routerLink="grant_signing_authority">Grant signing authority</a></li>
       <li role="presentation" routerLinkActive="active"><a routerLink="revoke_signing_authority">Revoke signing authority</a></li>
     </ul>
