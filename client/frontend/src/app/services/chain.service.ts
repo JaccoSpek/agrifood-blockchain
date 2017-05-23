@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Headers, Http, RequestOptions} from '@angular/http';
-import {Accreditation, CcRole} from '../types';
+import {Accreditation, Authorization, CcRole} from '../types';
 import 'rxjs/add/operator/toPromise';
 import { API_URL } from '../config';
 
@@ -181,6 +181,15 @@ export class ChainService {
     return this.http.post(url,args,this.opts)
       .toPromise()
       .then(response => response.text() as string)
+      .catch(ChainService.handleError);
+  }
+
+  get_issued_authorizations(party:string): Promise<Authorization[]> {
+    let url = `${this.apiURL}/get_issued_authorizations/${party}`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as Authorization[])
       .catch(ChainService.handleError);
   }
 

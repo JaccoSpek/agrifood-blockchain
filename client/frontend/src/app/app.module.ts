@@ -35,6 +35,7 @@ import {GrapeSignaturesComponent} from "./components/public/grape-signatures.com
 import {SignerCertsComponent} from "./components/public/signer-certs.component";
 import {AccreditationsOverviewComponent} from "./components/accreditationbody/accreditations-overview.component";
 import {IssuedAccreditationsComponent} from "./components/certificationbody/issued-accreditations.component";
+import {IssuedAuthorizationsComponent} from "./components/certificationbody/issued-authorizations.component";
 
 @NgModule({
   imports:      [ BrowserModule, HttpModule, FormsModule, AppRoutingModule ],
@@ -66,7 +67,8 @@ import {IssuedAccreditationsComponent} from "./components/certificationbody/issu
     GrapeOwnerShipTrailComponent,
     GrapeSignaturesComponent,
     SignerCertsComponent,
-    IssuedAccreditationsComponent
+    IssuedAccreditationsComponent,
+    IssuedAuthorizationsComponent
   ],
   providers:    [ SharedService, ChainService ],
   bootstrap:    [ AppComponent ]

@@ -1,0 +1,28 @@
+<div *ngIf="role && role.Role == 'CertificationBody'">
+  <h4>Issued Accreditations</h4>
+  <div class="alert" [ngClass]="msg.level" *ngIf="msg">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <table class="table table-bordered" *ngIf="authorizations && authorizations.length > 0">
+    <thead>
+    <tr>
+      <th>Authorized Party</th>
+      <th>Certification body</th>
+      <th>AccreditationID</th>
+      <th>Expires</th>
+      <th>Revoked</th>
+      <th>Revocation timestamp</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let authorization of authorizations">
+      <td>{{authorization.AuthorizedParty}}</td>
+      <td>{{authorization.CertifyingParty}}</td>
+      <td>{{authorization.AccreditationID}}</td>
+      <td>{{authorization.Expires}}</td>
+      <td>{{authorization.Revoked}}</td>
+      <td><span *ngIf="authorization.Revoked">{{authorization.RevocationTimestamp}}</span></td>
+    </tr>
+    </tbody>
+  </table>
+</div>

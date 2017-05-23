@@ -26,6 +26,7 @@ type Party struct {
 // party authorized to use a certain accreditation
 type SigningAuthorization struct {
 	AuthorizedParty     string
+	CertifyingParty     string
 	AccreditationID     string
 	Expires             time.Time
 	Revoked             bool
@@ -557,7 +558,7 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 	}
 
 	// create and save signing authorization
-	signingAuthorization := SigningAuthorization{AuthorizedParty:authorizedParty.ID, AccreditationID:accreditation.ID,Revoked:false}
+	signingAuthorization := SigningAuthorization{AuthorizedParty:authorizedParty.ID, CertifyingParty:party.ID, AccreditationID:accreditation.ID,Revoked:false}
 	signingAuthorization.Expires, err = time.Parse(time.RFC3339,args[2])
 	if err != nil {
 		msg := "Error parsing time (expiration date)"
@@ -565,7 +566,7 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 		return nil, errors.New(msg)
 	}
 
-	err = t.saveSigningAuthorization(stub,signingAuthorization,false)
+	err = t.saveSigningAuthorization(stub,signingAuthorization,true)
 	if err != nil {
 		msg := fmt.Sprintf("Error saving signing authorization: %s", err)
 		myLogger.Error(msg)
@@ -1233,6 +1234,8 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.get_party_accreditations(stub, args)
 	} else if function == "get_issued_accreditations" {
 		return t.get_issued_accreditations(stub, args)
+	} else if function == "get_issued_authorizations" {
+		return t.get_issued_authorizations(stub, args)
 	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
@@ -1537,6 +1540,54 @@ func (t *AgrifoodChaincode) get_issued_accreditations(stub shim.ChaincodeStubInt
 
 	myLogger.Infof("Accreditations issued to %s: %s",party.ID,string(party_accreditations_b[:]))
 	return party_accreditations_b, nil
+}
+
+func (t *AgrifoodChaincode) get_issued_authorizations(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 1" // party
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	cb, err := t.getParty(stub, args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	if cb.Role != t.roles[1] {
+		msg := fmt.Sprintf("Supplied party is no CertificationBody: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Find signing authorizations issued by %s", cb.ID)
+
+	authorizations, err := t.getSigningAuthorizations(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving accreditations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	var issued_authorizations []SigningAuthorization
+	for _, auth := range authorizations {
+		if auth.CertifyingParty == cb.ID {
+			issued_authorizations = append(issued_authorizations, auth)
+		}
+	}
+
+	issued_authorizations_b, err := json.Marshal(issued_authorizations)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling issued_authorizations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Accreditations issued to %s: %s", cb.ID,string(issued_authorizations_b[:]))
+	return issued_authorizations_b, nil
 }
 
 // get specific grape unit

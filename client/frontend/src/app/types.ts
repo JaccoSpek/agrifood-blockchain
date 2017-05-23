@@ -8,19 +8,6 @@ export class CcRole {
   Role:string;
 }
 
-/*
- // accreditation to issue
- type SigningAccreditation struct {
- ID			string
- Description		string
- AccreditationBody	string
- CertificationBody	string
- Created			time.Time
- Expires			time.Time
- Revoked			bool
- RevocationTimestamp	time.Time
- }
- */
 export class Accreditation {
   ID:string;
   description:string;
@@ -30,4 +17,13 @@ export class Accreditation {
   Expires:string;
   Revoked:boolean;
   RevocationTimestamp:string;
+}
+
+export class Authorization {
+  AuthorizedParty:      string;
+  CertifyingParty:      string;
+  AccreditationID:      string;
+  Expires:              string;
+  Revoked:              boolean;
+  RevocationTimestamp:  string;
 }
