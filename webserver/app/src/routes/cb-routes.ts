@@ -40,12 +40,12 @@ export class CBRoutes extends BaseChainRoute {
     }
 
     private revoke_signing_authority(req:Request, res:Response):void {
-        this.verifyRequest(req,["cid","party","timestamp"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+        this.verifyRequest(req,["accr_id","party","timestamp"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
             if(err) {
                 console.log("Error: %s",err.message);
                 res.status(400).send(err.message)
             } else {
-                let args = [req.body['cid'],req.body['party'],req.body['timestamp']];
+                let args = [req.body['accr_id'],req.body['party'],req.body['timestamp']];
                 this.invokeChaincode(ccID,'revoke_signing_authority',args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);

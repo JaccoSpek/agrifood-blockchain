@@ -23,6 +23,7 @@ export class Authorization {
   AuthorizedParty:      string;
   CertifyingParty:      string;
   AccreditationID:      string;
+  Accreditation:        Accreditation;
   Expires:              string;
   Revoked:              boolean;
   RevocationTimestamp:  string;

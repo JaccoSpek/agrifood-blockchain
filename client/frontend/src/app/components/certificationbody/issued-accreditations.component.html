@@ -20,7 +20,7 @@
       <td>{{accreditation.CertificationBody}}</td>
       <td>{{accreditation.Created}}</td>
       <td>{{accreditation.Expires}}</td>
-      <td>{{accreditation.Revoked}}</td>
+      <td [ngClass]="accreditation.Revoked ? 'danger' : 'success'">{{accreditation.Revoked}}</td>
       <td><span *ngIf="accreditation.Revoked">{{accreditation.RevocationTimestamp}}</span></td>
     </tr>
     </tbody>

@@ -18,9 +18,9 @@
     <tr *ngFor="let authorization of authorizations">
       <td>{{authorization.AuthorizedParty}}</td>
       <td>{{authorization.CertifyingParty}}</td>
-      <td>{{authorization.AccreditationID}}</td>
+      <td [ngClass]="authorization.Accreditation && authorization.Accreditation.Revoked ? 'danger' : 'success'">{{authorization.AccreditationID}} <span *ngIf="authorization.Accreditation && authorization.Accreditation.Revoked">(revoked)</span></td>
       <td>{{authorization.Expires}}</td>
-      <td>{{authorization.Revoked}}</td>
+      <td [ngClass]="authorization.Revoked ? 'danger' : 'success'">{{authorization.Revoked}}</td>
       <td><span *ngIf="authorization.Revoked">{{authorization.RevocationTimestamp}}</span></td>
     </tr>
     </tbody>

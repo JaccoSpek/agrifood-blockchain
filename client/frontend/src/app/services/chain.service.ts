@@ -169,6 +169,15 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
+  get_accreditation(accr_id:string): Promise<Accreditation> {
+    let url = `${this.apiURL}/get_accreditation/${accr_id}`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as Accreditation)
+      .catch(ChainService.handleError);
+  }
+
   grant_signing_authority(accreditation:string,farm:string,expiration_date:string): Promise<string> {
     let url = `${this.apiURL}/cb/grant_signing_authority`;
 
@@ -191,6 +200,22 @@ export class ChainService {
       .toPromise()
       .then(response => response.json() as Authorization[])
       .catch(ChainService.handleError);
+  }
+
+  revoke_signing_authority(accr_id:string,party:string,timestamp:string): Promise<string> {
+    let url = `${this.apiURL}/cb/revoke_signing_authority`
+
+    let args = {
+      accr_id:accr_id,
+      party:party,
+      timestamp:timestamp
+    };
+
+    console.log(args);
+    return this.http.post(url,args,this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError)
   }
 
   private static handleError(error: any): Promise<any> {

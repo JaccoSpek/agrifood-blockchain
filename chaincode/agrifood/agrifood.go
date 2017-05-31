@@ -397,6 +397,7 @@ func (t *AgrifoodChaincode) issue_signing_accreditation(stub shim.ChaincodeStubI
 		return nil, errors.New(msg)
 	}
 
+	// verify accreditation is not revoked
 	if accreditation.Revoked {
 		msg := fmt.Sprintf("Error: Accreditation is revoked at %s",accreditation.RevocationTimestamp)
 		myLogger.Warning(msg)
@@ -535,6 +536,13 @@ func (t *AgrifoodChaincode) grant_signing_authority(stub shim.ChaincodeStubInter
 		return nil, errors.New(msg)
 	}
 
+	// verify accreditation is not revoked
+	if accreditation.Revoked {
+		msg := fmt.Sprintf("Error: Accreditation is revoked at %s",accreditation.RevocationTimestamp)
+		myLogger.Warning(msg)
+		return nil, errors.New(msg)
+	}
+
 	// see if accreditation is still valid
 	if accreditation.Expires.Before(time.Now()) {
 		msg := "Error: Accreditation expired"
@@ -653,7 +661,7 @@ func (t *AgrifoodChaincode) revoke_signing_authority(stub shim.ChaincodeStubInte
 		return nil, errors.New(msg)
 	}
 
-	msg := fmt.Sprintf("Successfully granted signing authority of %s to %s",signingAuthorization.AccreditationID,signingAuthorization.AuthorizedParty)
+	msg := fmt.Sprintf("Successfully revoked signing authority of %s to %s",signingAuthorization.AccreditationID,signingAuthorization.AuthorizedParty)
 	myLogger.Info(msg)
 	return []byte(msg),nil
 }
@@ -1236,6 +1244,8 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.get_issued_accreditations(stub, args)
 	} else if function == "get_issued_authorizations" {
 		return t.get_issued_authorizations(stub, args)
+	} else if function == "get_accreditation" {
+		return t.get_accreditation(stub, args)
 	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
@@ -1542,6 +1552,33 @@ func (t *AgrifoodChaincode) get_issued_accreditations(stub shim.ChaincodeStubInt
 	return party_accreditations_b, nil
 }
 
+// return specific accreditation
+func (t *AgrifoodChaincode) get_accreditation(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 1" // accreditationID
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	accreditation, err := t.getSigningAccreditation(stub, args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving accreditation: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	accreditation_b, err := json.Marshal(accreditation)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling accreditation: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	return accreditation_b,nil
+}
+
+// return all authorizations issued by party
 func (t *AgrifoodChaincode) get_issued_authorizations(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	// Check number of arguments
 	if len(args) != 1 {

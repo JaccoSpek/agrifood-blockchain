@@ -3,7 +3,7 @@
   <div class="alert" [ngClass]="msg.level" *ngIf="msg">
     <strong>{{msg.text}}</strong>
   </div>
-  <div class="form-group" *ngIf="accreditations">
+  <div class="form-group" *ngIf="accreditations && accreditations.length > 0">
     <label for="accreditation">Accreditation:</label>
     <select id="accreditation" class="form-control" [(ngModel)]="selectedAccreditation">
       <option *ngFor="let accreditation of accreditations" [value]="accreditation.ID">{{accreditation.ID}}</option>
