@@ -1,3 +1,17 @@
 <div *ngIf="role && role.Role == 'Farm'">
-  <h3>Create Grapes</h3>
+  <h4>Create grapes</h4>
+  <div class="alert" [ngClass]="msg.level" *ngIf="msg">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <div class="form-group">
+    <label for="uuid">Batch ID:</label>
+    <input type="text" class="form-control" id="uuid" [(ngModel)]="uuid">
+  </div>
+  <div class="form-group">
+    <label for="created_date">Created date:</label>
+    <input type="text" class="form-control" id="created_date" [(ngModel)]="created_date">
+  </div>
+  <div class="form-group">
+    <button type="button" class="btn btn-success" (click)="createGrapes(uuid,created_date)">Create grape asset</button>
+  </div>
 </div>

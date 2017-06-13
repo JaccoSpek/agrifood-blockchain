@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import {Headers, Http, RequestOptions} from '@angular/http';
-import {Accreditation, Authorization, CcRole} from '../types';
+import {Accreditation, Authorization, CcRole, GrapeAsset} from '../types';
 import 'rxjs/add/operator/toPromise';
 import { API_URL } from '../config';
+import {stringifyElement} from "@angular/platform-browser/testing/src/browser_util";
 
 @Injectable()
 export class ChainService {
@@ -202,6 +203,15 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
+  get_granted_authorizations(party:string): Promise<Authorization[]> {
+    let url = `${this.apiURL}/get_granted_authorizations/${party}`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as Authorization[])
+      .catch(ChainService.handleError);
+  }
+
   revoke_signing_authority(accr_id:string,party:string,timestamp:string): Promise<string> {
     let url = `${this.apiURL}/cb/revoke_signing_authority`
 
@@ -211,12 +221,36 @@ export class ChainService {
       timestamp:timestamp
     };
 
-    console.log(args);
     return this.http.post(url,args,this.opts)
       .toPromise()
       .then(response => response.text() as string)
-      .catch(ChainService.handleError)
+      .catch(ChainService.handleError);
   }
+
+  create_grapes(uuid:string,timestamp:string):Promise<string> {
+    let url = `${this.apiURL}/farm/create_grapes`;
+
+    let args = {
+      uuid:uuid,
+      timestamp:timestamp
+    };
+
+    return this.http.post(url,args,this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError);
+  }
+
+  get_created_grapes(party:string):Promise<GrapeAsset[]> {
+    let url = `${this.apiURL}/get_created_grapes/${party}`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as GrapeAsset[])
+      .catch(ChainService.handleError);
+  }
+
+  //certify_grapes
 
   private static handleError(error: any): Promise<any> {
     console.error('An error occurred', error);

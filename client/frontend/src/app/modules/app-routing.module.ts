@@ -14,7 +14,9 @@ import { RevokeSigningAuthorityComponent } from '../components/certificationbody
 import { IssuedAccreditationsComponent } from '../components/certificationbody/issued-accreditations.component';
 import { IssuedAuthorizationsComponent } from '../components/certificationbody/issued-authorizations.component';
 import { FarmComponent } from '../components/farm/farm.component';
+import { GrantedAuthorizationsComponent } from '../components/farm/granted-authorizations.component';
 import { CreateGrapesComponent } from '../components/farm/create-grapes.component';
+import { GrapeAssetsComponent } from '../components/farm/grape-assets.component';
 import { CertifyGrapesComponent } from '../components/farm/certify-grapes.component';
 import { TransferGrapesComponent } from '../components/farm/transfer-grapes.component';
 import { AuditorComponent } from '../components/auditor/auditor.component';
@@ -46,7 +48,9 @@ const routes: Routes = [
     { path: 'issued_authorizations', component:IssuedAuthorizationsComponent }
   ]},
   { path: 'farm', component: FarmComponent, children: [
+    { path: 'granted_authorizations', component:GrantedAuthorizationsComponent },
     { path: 'create_grapes', component:CreateGrapesComponent },
+    { path: 'view_grapes', component:GrapeAssetsComponent },
     { path: 'certify_grapes', component:CertifyGrapesComponent },
     { path: 'transfer_grapes', component:TransferGrapesComponent }
   ]},

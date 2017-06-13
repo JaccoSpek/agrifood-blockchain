@@ -744,7 +744,7 @@ func (t *AgrifoodChaincode) certify_grapes(stub shim.ChaincodeStubInterface, arg
 
 	// Check number of arguments
 	if len(args) != 3 {
-		msg := "Incorrect number of arguments. Expecting 3" // UUID, certificateID, timestamp
+		msg := "Incorrect number of arguments. Expecting 3" // UUID, accreditationID, timestamp
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -1246,6 +1246,10 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.get_issued_authorizations(stub, args)
 	} else if function == "get_accreditation" {
 		return t.get_accreditation(stub, args)
+	} else if function == "get_granted_authorizations" {
+		return t.get_granted_authorizations(stub, args)
+	} else if function == "get_created_grapes" {
+		return t.get_created_grapes(stub, args)
 	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
@@ -1623,8 +1627,106 @@ func (t *AgrifoodChaincode) get_issued_authorizations(stub shim.ChaincodeStubInt
 		return nil, errors.New(msg)
 	}
 
-	myLogger.Infof("Accreditations issued to %s: %s", cb.ID,string(issued_authorizations_b[:]))
+	myLogger.Infof("Accreditations issued by %s: %s", cb.ID,string(issued_authorizations_b[:]))
 	return issued_authorizations_b, nil
+}
+
+// return all authorizations granted to party
+func (t *AgrifoodChaincode) get_granted_authorizations(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 1" // party
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	farm, err := t.getParty(stub, args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	if farm.Role != t.roles[2] {
+		msg := fmt.Sprintf("Supplied party is no Farm: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Find signing authorizations issued to %s", farm.ID)
+
+	authorizations, err := t.getSigningAuthorizations(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving accreditations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	var granted_authorizations []SigningAuthorization
+	for _, auth := range authorizations {
+		if auth.AuthorizedParty == farm.ID {
+			granted_authorizations = append(granted_authorizations, auth)
+		}
+	}
+
+	granted_authorizations_b, err := json.Marshal(granted_authorizations)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling granted_authorizations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Accreditations issued to %s: %s", farm.ID,string(granted_authorizations_b[:]))
+	return granted_authorizations_b, nil
+}
+
+// return all grape assets created by party
+func (t *AgrifoodChaincode) get_created_grapes(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	// Check number of arguments
+	if len(args) != 1 {
+		msg := "Incorrect number of arguments. Expecting 1" // party
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	farm, err := t.getParty(stub, args[0])
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	if farm.Role != t.roles[2] {
+		msg := fmt.Sprintf("Supplied party is no Farm: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Find all grape assets created by party %s", farm.ID)
+
+	grapes, err := t.getGrapes(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving grapes: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	var party_grapes []GrapesUnit
+	for _,unit := range grapes {
+		if unit.Producer == farm.ID { // grapes from this farm
+			party_grapes = append(party_grapes,unit)
+		}
+	}
+
+	party_grapes_b, err := json.Marshal(party_grapes)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling party_grapes: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Return grapes created by %s", farm.ID)
+	return party_grapes_b,nil
 }
 
 // get specific grape unit
@@ -1667,7 +1769,7 @@ func (t *AgrifoodChaincode) getGrapes(stub shim.ChaincodeStubInterface) ([]Grape
 }
 
 // get specific signing authorization
-func (t *AgrifoodChaincode) getSigningAuthorization(stub shim.ChaincodeStubInterface, certID string, partyID string) (SigningAuthorization, error) {
+func (t *AgrifoodChaincode) getSigningAuthorization(stub shim.ChaincodeStubInterface, accrID string, partyID string) (SigningAuthorization, error) {
 	auths, err := t.getSigningAuthorizations(stub)
 	if err != nil {
 		msg := fmt.Sprintf("Error retreiving auths: %s", err)
@@ -1676,7 +1778,7 @@ func (t *AgrifoodChaincode) getSigningAuthorization(stub shim.ChaincodeStubInter
 	}
 
 	for _, auth := range auths {
-		if auth.AccreditationID == certID && auth.AuthorizedParty == partyID {
+		if auth.AccreditationID == accrID && auth.AuthorizedParty == partyID {
 			return auth, nil
 		}
 	}

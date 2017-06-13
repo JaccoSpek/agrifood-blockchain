@@ -18,8 +18,7 @@ export class CreateAccreditationComponent extends AppComponent implements OnInit
     super(sharedSrv);
   };
 
-  ngOnInit():void {
-    super.ngOnInit();
+  OnInitialized():void {
     let now:Date = new Date();
     this.created_date = now.toISOString();
     now.setFullYear(now.getFullYear()+1);
