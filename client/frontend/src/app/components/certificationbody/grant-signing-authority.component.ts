@@ -39,7 +39,9 @@ export class GrantSigningAuthorityComponent extends AppComponent {
     });
 
     // set expiration date
-    this.expiration_date = new Date().toISOString();
+    let exp_date:Date = new Date();
+    exp_date.setFullYear(exp_date.getFullYear()+1);
+    this.expiration_date = exp_date.toISOString();
   }
 
   grant_signing_authority(accreditation:string,farm:string,expiration_date:string):void {

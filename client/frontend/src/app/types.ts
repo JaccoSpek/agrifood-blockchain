@@ -29,24 +29,6 @@ export class Authorization {
   RevocationTimestamp:  string;
 }
 
-/*
- // signature to attach to assets
- type AccreditationSignature struct {
- Issuer              string
- AccreditationID     string
- Issued              time.Time
- Revoked             bool
- RevocationTimestamp time.Time
- }
-
- // Entity in ownership chain
- type OwnershipEntry struct {
- PartyID		string
- Timestamp	time.Time
- }
-
- */
-
 export class AccreditationSignature {
   Issuer:               string;
   AccreditationID:      string;

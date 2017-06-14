@@ -45,12 +45,12 @@ export class FarmRoutes extends BaseChainRoute {
     }
 
     private certify_grapes(req:Request, res:Response):void {
-        this.verifyRequest(req,["uuid","cid","timestamp"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+        this.verifyRequest(req,["uuid","accr_id","timestamp"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
             if(err) {
                 console.log("Error: %s",err.message);
                 res.status(400).send(err.message)
             } else {
-                let args = [req.body['uuid'],req.body['cid'],req.body['timestamp']];
+                let args = [req.body['uuid'],req.body['accr_id'],req.body['timestamp']];
                 this.invokeChaincode(ccID,'certify_grapes',args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);

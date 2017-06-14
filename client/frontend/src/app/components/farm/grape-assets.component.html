@@ -19,8 +19,8 @@
       <td>{{grapeAsset.Producer}}</td>
       <td>{{grapeAsset.Created}}</td>
       <td>
-        <ul *ngIf="grapeAsset.AccreditationSignatures && grapeAsset.AccreditationSignatures.length > 0">
-          <li *ngFor="let sig of grapeAsset.AccreditationSignatures">{{sig.AccreditationID}}</li>
+        <ul class="list-group" *ngIf="grapeAsset.AccreditationSignatures && grapeAsset.AccreditationSignatures.length > 0">
+          <li class="list-group-item" *ngFor="let sig of grapeAsset.AccreditationSignatures">{{sig.AccreditationID}}</li>
         </ul>
       </td>
       <td>

@@ -21,10 +21,14 @@ export class GrapeAssetsComponent extends AppComponent{
     // get created grapes
     this.chainService.get_created_grapes(this.enrolledId).then(result => {
       this.grapeAssets = result as GrapeAsset[];
-      console.log(this.grapeAssets);
 
       if(!this.grapeAssets || (this.grapeAssets && this.grapeAssets.length == 0)){
         this.msg = {text:"No grape assets found", level:"alert-info"}
+      } else {
+        this.grapeAssets.forEach((asset,idx) => {
+          // TODO: verify certificate
+          
+        });
       }
 
     });

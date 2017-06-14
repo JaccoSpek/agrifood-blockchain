@@ -134,6 +134,10 @@ func (t *AgrifoodChaincode) Invoke(stub shim.ChaincodeStubInterface, function st
 		return t.create_grapes(stub, args)
 	} else if function == "certify_grapes" {
 		return t.certify_grapes(stub, args)
+	} else if function == "revoke_signature" {
+		return t.revoke_signature(stub, args)
+	} else if function == "transfer_grapes" {
+		return t.transfer_grapes(stub, args)
 	}
 
 	myLogger.Errorf("Received unknown function invocation: %s", function)

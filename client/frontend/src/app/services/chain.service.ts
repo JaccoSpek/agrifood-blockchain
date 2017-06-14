@@ -250,7 +250,20 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
-  //certify_grapes
+  certify_grapes(uuid:string,accr_id:string,timestamp:string):Promise<string> {
+    let url = `${this.apiURL}/farm/certify_grapes`;
+
+    let args = {
+      uuid: uuid,
+      accr_id: accr_id,
+      timestamp:timestamp
+    };
+
+    return this.http.post(url,args,this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError);
+  }
 
   private static handleError(error: any): Promise<any> {
     console.error('An error occurred', error);
