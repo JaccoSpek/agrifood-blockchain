@@ -20,7 +20,7 @@
       <td>{{grapeAsset.Created}}</td>
       <td>
         <ul class="list-group" *ngIf="grapeAsset.AccreditationSignatures && grapeAsset.AccreditationSignatures.length > 0">
-          <li class="list-group-item" *ngFor="let sig of grapeAsset.AccreditationSignatures">{{sig.AccreditationID}}</li>
+          <li class="list-group-item" *ngFor="let sig of grapeAsset.AccreditationSignatures" [ngClass]="sig.Valid ? 'list-group-item-success' : 'list-group-item-danger'">{{sig.AccreditationID}}</li>
         </ul>
       </td>
       <td>

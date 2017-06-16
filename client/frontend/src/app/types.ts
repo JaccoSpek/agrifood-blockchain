@@ -35,6 +35,7 @@ export class AccreditationSignature {
   Issued:               string;
   Revoked:              boolean;
   RevocationTimestamp:  string;
+  Valid:                boolean;
 }
 
 export class OwnershipEntry {

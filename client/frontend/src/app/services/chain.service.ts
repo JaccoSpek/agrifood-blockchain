@@ -212,8 +212,17 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
+  get_granted_authorization(accr_id:string,authorized_party:string): Promise<Authorization> {
+    let url = `${this.apiURL}/get_granted_authorization/${accr_id}/${authorized_party}`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as Authorization)
+      .catch(ChainService.handleError);
+  }
+
   revoke_signing_authority(accr_id:string,party:string,timestamp:string): Promise<string> {
-    let url = `${this.apiURL}/cb/revoke_signing_authority`
+    let url = `${this.apiURL}/cb/revoke_signing_authority`;
 
     let args = {
       accr_id:accr_id,
