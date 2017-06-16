@@ -259,6 +259,15 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
+  get_own_grapes():Promise<GrapeAsset[]> {
+    let url = `${this.apiURL}/get_own_grapes`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as GrapeAsset[])
+      .catch(ChainService.handleError);
+  }
+
   certify_grapes(uuid:string,accr_id:string,timestamp:string):Promise<string> {
     let url = `${this.apiURL}/farm/certify_grapes`;
 

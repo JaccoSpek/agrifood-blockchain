@@ -62,9 +62,14 @@ export class PublicRoutes extends BaseChainRoute {
             this.get_granted_authorization(req,res);
         });
 
-        // get issued authorizations
+        // get created grapes
         this.router.get("/get_created_grapes/:party", (req:Request, res:Response) => {
             this.get_created_grapes(req,res);
+        });
+
+        // get own grapes
+        this.router.get("/get_own_grapes", (req:Request, res:Response) => {
+            this.get_own_grapes(req,res);
         });
 
     }
@@ -297,6 +302,26 @@ export class PublicRoutes extends BaseChainRoute {
             } else {
                 let args = [req.params['party']];
                 this.queryChaincode(ccID,"get_created_grapes",args,user,tcert,(err:Error, result:any)=>{
+                    if(err) {
+                        console.log("Error: %s",err.message);
+                        res.status(400).send(err.message);
+                    } else {
+                        console.log("Queried results: %s", result);
+                        res.type('json').send(result);
+                    }
+                });
+            }
+        });
+    }
+
+    private get_own_grapes(req:Request, res:Response):void {
+        this.verifyQueryRequest(req,[],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+            if(err){
+                console.log("Error: %s",err.message);
+                res.status(400).send(err.message);
+            } else {
+                let args = [];
+                this.queryChaincode(ccID,"get_own_grapes",args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message);

@@ -50,7 +50,6 @@ export class GrapeAssetsComponent extends AppComponent{
                         console.log("invalid accreditation");
                       } else {
                         this.grapeAssets[asset_idx].AccreditationSignatures[sig_idx].Valid = true;
-                        console.log("valid");
                       }
                     });
                   }

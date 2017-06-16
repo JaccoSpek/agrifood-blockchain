@@ -1256,6 +1256,8 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.get_granted_authorization(stub, args)
 	} else if function == "get_created_grapes" {
 		return t.get_created_grapes(stub, args)
+	} else if function == "get_own_grapes" {
+		return t.get_own_grapes(stub)
 	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
@@ -1765,6 +1767,50 @@ func (t *AgrifoodChaincode) get_created_grapes(stub shim.ChaincodeStubInterface,
 	}
 
 	myLogger.Infof("Return grapes created by %s", farm.ID)
+	return party_grapes_b,nil
+}
+
+// return all grape assets owned by party
+func (t *AgrifoodChaincode) get_own_grapes(stub shim.ChaincodeStubInterface) ([]byte, error) {
+
+	party, err := t.getCallerParty(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving caller party: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	if party.Role != t.roles[2] || party.Role != t.roles[4] {
+		msg := fmt.Sprintf("Supplied party is no Farm or Trader: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Find all grape assets owned by party %s", party.ID)
+
+	grapes, err := t.getGrapes(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving grapes: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	var party_grapes []GrapesUnit
+	for _,unit := range grapes {
+		current_owner := unit.Ownership[len(unit.Ownership)-1].PartyID
+		if(current_owner == party.ID) {
+			party_grapes = append(party_grapes,unit)
+		}
+	}
+
+	party_grapes_b, err := json.Marshal(party_grapes)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling party_grapes: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Return grapes owned by %s", party.ID)
 	return party_grapes_b,nil
 }
 
