@@ -1,3 +1,25 @@
 <div *ngIf="role && role.Role == 'Trader'">
-  <h3>Transfer Grapes</h3>
+  <h4>Transfer Grapes</h4>
+  <div class="alert" *ngFor="let msg of msgs" [ngClass]="msg.level">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <div class="form-group" *ngIf="grapeAssets">
+    <label for="grapeAsset">Grape asset:</label>
+    <select id="grapeAsset" class="form-control" [(ngModel)]="selectedGrapeAsset">
+      <option *ngFor="let grapeAsset of grapeAssets" [value]="grapeAsset.UUID">{{grapeAsset.UUID}}</option>
+    </select>
+  </div>
+  <div class="form-group" *ngIf="traders">
+    <label for="trader">Trader:</label>
+    <select id="trader" class="form-control" [(ngModel)]="selectedTrader">
+      <option *ngFor="let trader of traders" [value]="trader">{{trader}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="timestamp">Timestamp:</label>
+    <input type="text" class="form-control" id="timestamp" [(ngModel)]="timestamp">
+  </div>
+  <div class="form-group" *ngIf="selectedGrapeAsset && selectedTrader">
+    <button type="button" class="btn btn-success" (click)="transfer_asset(selectedGrapeAsset,selectedTrader,timestamp)">Transfer grape asset</button>
+  </div>
 </div>

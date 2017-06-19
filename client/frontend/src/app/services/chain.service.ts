@@ -283,6 +283,21 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
+  transfer_grapes(uuid:string,trader_id:string,timestamp:string):Promise<string> {
+    let url = `${this.apiURL}/farm/transfer_grapes`;
+
+    let args = {
+      uuid: uuid,
+      party: trader_id,
+      timestamp:timestamp
+    };
+
+    return this.http.post(url,args,this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError);
+  }
+
   private static handleError(error: any): Promise<any> {
     console.error('An error occurred', error);
     return Promise.reject(error.message || error);

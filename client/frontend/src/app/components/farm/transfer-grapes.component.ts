@@ -12,6 +12,7 @@ import {ChainService} from "../../services/chain.service";
 export class TransferGrapesComponent extends AppComponent {
   private traders:string[];
   private grapeAssets:GrapeAsset[];
+  private timestamp:string;
   private msg:Message;
 
   constructor(private sharedSrv:SharedService,private chainService:ChainService) {
@@ -29,6 +30,21 @@ export class TransferGrapesComponent extends AppComponent {
     this.chainService.get_own_grapes().then(result => {
       this.grapeAssets = result as GrapeAsset[];
       console.log(this.grapeAssets);
+    });
+
+    // set current timestamp
+    let now:Date = new Date();
+    this.timestamp = now.toISOString();
+  }
+
+  transfer_asset(grape_asset_UUID:string,trader_ID:string,timestamp:string):void {
+    console.log("Transfer grapes %s to %s at %s",grape_asset_UUID,trader_ID,timestamp);
+    this.msg = {text:"Transfer grape asset..",level:"alert-info"};
+    this.chainService.transfer_grapes(grape_asset_UUID,trader_ID,timestamp).then(result => {
+      console.log(result);
+      this.msg = {text:result,level:"alert-success"};
+    }).catch(reason => {
+      this.msg = {text:reason.toString(),level:"alert-danger"};
     });
   }
 }

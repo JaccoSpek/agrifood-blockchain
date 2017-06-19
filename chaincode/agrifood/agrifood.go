@@ -1780,8 +1780,8 @@ func (t *AgrifoodChaincode) get_own_grapes(stub shim.ChaincodeStubInterface) ([]
 		return nil, errors.New(msg)
 	}
 
-	if party.Role != t.roles[2] || party.Role != t.roles[4] {
-		msg := fmt.Sprintf("Supplied party is no Farm or Trader: %s", err)
+	if party.Role != t.roles[2] && party.Role != t.roles[4] {
+		msg := fmt.Sprintf("Supplied party (%s) is no Farm or Trader: %s", party.ID, err)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}

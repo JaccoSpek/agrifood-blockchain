@@ -25,6 +25,7 @@ import { AuditorRevokeSigningAuthorityComponent } from '../components/auditor/au
 import { AuditorRevokeSignatureComponent } from '../components/auditor/auditor-revoke-signature';
 import { TraderComponent } from '../components/trader/trader.component';
 import { TraderTransferGrapesComponent } from '../components/trader/trader-transfer-grapes.component';
+import { OwnedGrapesComponent } from '../components/trader/owned-grapes.component';
 import { PublicComponent } from '../components/public/public.component';
 import { GrapeOwnerShipTrailComponent } from '../components/public/grape-ownership-trail.component';
 import { GrapeSignaturesComponent } from '../components/public/grape-signatures.component';
@@ -60,6 +61,7 @@ const routes: Routes = [
     { path: 'revoke_signature', component: AuditorRevokeSignatureComponent }
   ]},
   { path: 'trader', component: TraderComponent, children:[
+    { path: 'owned_grapes', component: OwnedGrapesComponent },
     { path: 'transfer_grapes', component: TraderTransferGrapesComponent }
   ]},
   { path: 'public', component: PublicComponent, children:[

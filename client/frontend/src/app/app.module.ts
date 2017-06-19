@@ -38,6 +38,7 @@ import {IssuedAccreditationsComponent} from "./components/certificationbody/issu
 import {IssuedAuthorizationsComponent} from "./components/certificationbody/issued-authorizations.component";
 import {GrantedAuthorizationsComponent} from "./components/farm/granted-authorizations.component";
 import {GrapeAssetsComponent} from "./components/farm/grape-assets.component";
+import {OwnedGrapesComponent} from "./components/trader/owned-grapes.component";
 
 @NgModule({
   imports:      [ BrowserModule, HttpModule, FormsModule, AppRoutingModule ],
@@ -65,6 +66,7 @@ import {GrapeAssetsComponent} from "./components/farm/grape-assets.component";
     AuditorRevokeSignatureComponent,
     TraderComponent,
     TraderTransferGrapesComponent,
+    OwnedGrapesComponent,
     PublicComponent,
     GrapeOwnerShipTrailComponent,
     GrapeSignaturesComponent,

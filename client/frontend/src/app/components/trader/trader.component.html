@@ -6,6 +6,7 @@
     </div>
 
     <ul class="nav nav-tabs" *ngIf="role && role.Role == 'Trader'">
+      <li role="presentation" routerLinkActive="active"><a routerLink="owned_grapes">My grapes</a></li>
       <li role="presentation" routerLinkActive="active"><a routerLink="transfer_grapes">Transfer grapes</a></li>
     </ul>
 
