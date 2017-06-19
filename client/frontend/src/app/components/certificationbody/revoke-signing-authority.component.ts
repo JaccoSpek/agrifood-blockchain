@@ -25,9 +25,11 @@ export class RevokeSigningAuthorityComponent extends AppComponent {
     this.chainService.get_issued_authorizations(this.enrolledId).then(result => {
       let auths:Authorization[] = result as Authorization[];
 
-      this.authorizations = auths.filter(
-        auth => !auth.Revoked
-      );
+      if(auths && auths.length > 0){
+        this.authorizations = auths.filter(
+          auth => !auth.Revoked
+        );
+      }
 
       if(this.authorizations){
         this.authorizations.forEach((auth,idx) => {

@@ -72,6 +72,11 @@ export class PublicRoutes extends BaseChainRoute {
             this.get_own_grapes(req,res);
         });
 
+        // get accreditations
+        this.router.get("/get_accreditations", (req:Request, res:Response) => {
+            this.get_accreditations(req,res);
+        });
+
     }
 
     private grape_ownership_trail(req:Request, res:Response):void {
@@ -222,6 +227,26 @@ export class PublicRoutes extends BaseChainRoute {
             } else {
                 let args = [req.params['accr_id']];
                 this.queryChaincode(ccID,"get_accreditation",args,user,tcert,(err:Error, result:any)=>{
+                    if(err) {
+                        console.log("Error: %s",err.message);
+                        res.status(400).send(err.message);
+                    } else {
+                        console.log("Queried results: %s", result);
+                        res.type('json').send(result);
+                    }
+                });
+            }
+        });
+    }
+
+    private get_accreditations(req:Request, res:Response):void {
+        this.verifyQueryRequest(req,[],(err:Error,user:Member,tcert:TCert,ccID:string) => {
+            if(err){
+                console.log("Error: %s",err.message);
+                res.status(400).send(err.message);
+            } else {
+                let args = [];
+                this.queryChaincode(ccID,"get_accreditations",args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message);

@@ -1250,6 +1250,8 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.get_issued_authorizations(stub, args)
 	} else if function == "get_accreditation" {
 		return t.get_accreditation(stub, args)
+	} else if function == "get_accreditations" {
+		return t.get_accreditations(stub)
 	} else if function == "get_granted_authorizations" {
 		return t.get_granted_authorizations(stub, args)
 	} else if function == "get_granted_authorization" {
@@ -1588,6 +1590,26 @@ func (t *AgrifoodChaincode) get_accreditation(stub shim.ChaincodeStubInterface, 
 	}
 
 	return accreditation_b,nil
+}
+
+// return all accreditaitons
+func (t *AgrifoodChaincode) get_accreditations(stub shim.ChaincodeStubInterface) ([]byte, error) {
+	// get accreditations
+	accreditations, err := t.getSigningAccreditations(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving accreditation: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	accreditations_b, err := json.Marshal(accreditations)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling accreditations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	return accreditations_b,nil
 }
 
 // return all authorizations issued by party

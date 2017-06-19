@@ -179,6 +179,15 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
+  get_accreditations(): Promise<Accreditation[]> {
+    let url = `${this.apiURL}/get_accreditations`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as Accreditation[])
+      .catch(ChainService.handleError);
+  }
+
   grant_signing_authority(accreditation:string,farm:string,expiration_date:string): Promise<string> {
     let url = `${this.apiURL}/cb/grant_signing_authority`;
 

@@ -23,6 +23,7 @@ import { AuditorComponent } from '../components/auditor/auditor.component';
 import { AuditorRevokeAccreditationComponent } from '../components/auditor/auditor-revoke-accreditation.component';
 import { AuditorRevokeSigningAuthorityComponent } from '../components/auditor/auditor-revoke-signing-authority.component';
 import { AuditorRevokeSignatureComponent } from '../components/auditor/auditor-revoke-signature';
+import { AuditorAccreditationsComponent } from '../components/auditor/auditor-accreditations.component';
 import { TraderComponent } from '../components/trader/trader.component';
 import { TraderTransferGrapesComponent } from '../components/trader/trader-transfer-grapes.component';
 import { OwnedGrapesComponent } from '../components/trader/owned-grapes.component';
@@ -56,6 +57,7 @@ const routes: Routes = [
     { path: 'transfer_grapes', component:TransferGrapesComponent }
   ]},
   { path: 'auditor', component: AuditorComponent, children:[
+    { path: 'accreditations_overview', component: AuditorAccreditationsComponent },
     { path: 'revoke_accreditation', component: AuditorRevokeAccreditationComponent },
     { path: 'revoke_signing_authority', component: AuditorRevokeSigningAuthorityComponent },
     { path: 'revoke_signature', component: AuditorRevokeSignatureComponent }

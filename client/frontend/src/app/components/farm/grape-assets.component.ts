@@ -28,6 +28,7 @@ export class GrapeAssetsComponent extends AppComponent{
         let now = Date.now();
         this.grapeAssets.forEach((asset,asset_idx) => {
           // verify signature
+          // TODO: move to AppComponent
           if(asset.AccreditationSignatures && asset.AccreditationSignatures.length > 0){
             asset.AccreditationSignatures.forEach((sig,sig_idx) => {
               if(sig.Revoked){
