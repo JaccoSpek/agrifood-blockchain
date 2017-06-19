@@ -1,3 +1,19 @@
 <div *ngIf="role && role.Role == 'Auditor'">
-  <h3>Revoke signing authority</h3>
+  <h4>Revoke singing authority</h4>
+  <div class="alert" [ngClass]="msg.level" *ngIf="msg">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <div class="form-group" *ngIf="authorizations">
+    <label for="authorization">Authorization:</label>
+    <select id="authorization" class="form-control" [(ngModel)]="selectedAuthorization">
+      <option *ngFor="let authorization of authorizations; let i = index" [value]="i">{{authorization.AccreditationID}} for {{authorization.AuthorizedParty}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="revocation_timestamp">Revocation timestamp:</label>
+    <input type="text" class="form-control" id="revocation_timestamp" [(ngModel)]="revocation_timestamp">
+  </div>
+  <div class="form-group">
+    <button type="button" class="btn btn-danger" (click)="revoke_authorization(selectedAuthorization,revocation_timestamp)">Revoke authorization</button>
+  </div>
 </div>

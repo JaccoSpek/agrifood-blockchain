@@ -62,6 +62,11 @@ export class PublicRoutes extends BaseChainRoute {
             this.get_granted_authorization(req,res);
         });
 
+        // get all authorizations
+        this.router.get("/get_authorizations", (req:Request, res:Response) => {
+            this.get_authorizations(req,res);
+        });
+
         // get created grapes
         this.router.get("/get_created_grapes/:party", (req:Request, res:Response) => {
             this.get_created_grapes(req,res);
@@ -307,6 +312,26 @@ export class PublicRoutes extends BaseChainRoute {
             } else {
                 let args = [req.params['accr_id'],req.params['authorized_party']];
                 this.queryChaincode(ccID,"get_granted_authorization",args,user,tcert,(err:Error, result:any)=>{
+                    if(err) {
+                        console.log("Error: %s",err.message);
+                        res.status(400).send(err.message);
+                    } else {
+                        console.log("Queried results: %s", result);
+                        res.type('json').send(result);
+                    }
+                });
+            }
+        });
+    }
+
+    private get_authorizations(req:Request, res:Response):void {
+        this.verifyQueryRequest(req,[],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+            if(err){
+                console.log("Error: %s",err.message);
+                res.status(400).send(err.message);
+            } else {
+                let args = [];
+                this.queryChaincode(ccID,"get_authorizations",args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message);

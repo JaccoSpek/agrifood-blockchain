@@ -40,6 +40,7 @@ import {GrantedAuthorizationsComponent} from "./components/farm/granted-authoriz
 import {GrapeAssetsComponent} from "./components/farm/grape-assets.component";
 import {OwnedGrapesComponent} from "./components/trader/owned-grapes.component";
 import {AuditorAccreditationsComponent} from "./components/auditor/auditor-accreditations.component";
+import {AuditorAuthorizationsComponent} from "./components/auditor/auditor-authorizations.component";
 
 @NgModule({
   imports:      [ BrowserModule, HttpModule, FormsModule, AppRoutingModule ],
@@ -66,6 +67,7 @@ import {AuditorAccreditationsComponent} from "./components/auditor/auditor-accre
     AuditorRevokeSigningAuthorityComponent,
     AuditorRevokeSignatureComponent,
     AuditorAccreditationsComponent,
+    AuditorAuthorizationsComponent,
     TraderComponent,
     TraderTransferGrapesComponent,
     OwnedGrapesComponent,

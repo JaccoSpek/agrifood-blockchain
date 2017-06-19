@@ -230,6 +230,15 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
+  get_authorizations(): Promise<Authorization[]> {
+    let url = `${this.apiURL}/get_authorizations`;
+
+    return this.http.get(url,this.opts)
+      .toPromise()
+      .then(response => response.json() as Authorization[])
+      .catch(ChainService.handleError);
+  }
+
   revoke_signing_authority(accr_id:string,party:string,timestamp:string): Promise<string> {
     let url = `${this.apiURL}/cb/revoke_signing_authority`;
 

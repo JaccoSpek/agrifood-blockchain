@@ -627,8 +627,8 @@ func (t *AgrifoodChaincode) revoke_signing_authority(stub shim.ChaincodeStubInte
 	}
 
 	// verify access rights
-	if party.Role != t.roles[1] && accreditation.CertificationBody != party.ID {
-		msg := fmt.Sprintf("Party %s is not the certification body of %s", party.ID, accreditation.ID)
+	if (party.Role != t.roles[1] && accreditation.CertificationBody != party.ID) && party.Role != t.roles[3] {
+		msg := fmt.Sprintf("Party %s is not the certification body of %s, nor an auditor", party.ID, accreditation.ID)
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -1256,6 +1256,8 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.get_granted_authorizations(stub, args)
 	} else if function == "get_granted_authorization" {
 		return t.get_granted_authorization(stub, args)
+	}  else if function == "get_authorizations" {
+		return t.get_authorizations(stub)
 	} else if function == "get_created_grapes" {
 		return t.get_created_grapes(stub, args)
 	} else if function == "get_own_grapes" {
@@ -1741,6 +1743,26 @@ func (t *AgrifoodChaincode) get_granted_authorization(stub shim.ChaincodeStubInt
 	}
 
 	return authorization_b,nil
+}
+
+// return all authorizations
+func (t *AgrifoodChaincode) get_authorizations(stub shim.ChaincodeStubInterface) ([]byte, error) {
+	authorizations, err := t.getSigningAuthorizations(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving accreditations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	authorizations_b, err := json.Marshal(authorizations)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling granted_authorizations: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Return all authorizations")
+	return authorizations_b, nil
 }
 
 // return all grape assets created by party

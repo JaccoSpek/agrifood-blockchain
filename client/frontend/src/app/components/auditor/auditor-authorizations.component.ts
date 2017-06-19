@@ -1,4 +1,4 @@
-import { Component }    from '@angular/core';
+import {Component}    from '@angular/core';
 import { AppComponent } from "../../app.component";
 import {Accreditation, Authorization, Message} from "../../types";
 import {SharedService} from "../../services/shared.service";
@@ -6,12 +6,11 @@ import {ChainService} from "../../services/chain.service";
 
 @Component({
   moduleId: module.id,
-  selector: 'auditor-revoke-signing-authority',
-  templateUrl: 'auditor-revoke-signing-authority.component.html'
+  selector: 'auditor-authorizations',
+  templateUrl: 'auditor-authorizations.component.html'
 })
-export class AuditorRevokeSigningAuthorityComponent extends AppComponent {
+export class AuditorAuthorizationsComponent extends AppComponent{
   private authorizations:Authorization[];
-  private revocation_timestamp:string;
   private msg:Message;
 
   constructor(private sharedSrv:SharedService,private chainService:ChainService) {
@@ -19,17 +18,9 @@ export class AuditorRevokeSigningAuthorityComponent extends AppComponent {
   };
 
   OnInitialized():void {
-    this.revocation_timestamp = new Date().toISOString();
-
     // get issued authorizations
     this.chainService.get_authorizations().then(result => {
-      let auths:Authorization[] = result as Authorization[];
-
-      if(auths && auths.length > 0){
-        this.authorizations = auths.filter(
-          auth => !auth.Revoked
-        );
-      }
+      this.authorizations = result as Authorization[];
 
       if(this.authorizations){
         this.authorizations.forEach((auth,idx) => {
@@ -45,14 +36,4 @@ export class AuditorRevokeSigningAuthorityComponent extends AppComponent {
     });
   }
 
-  revoke_authorization(authorizationIdx:number,timestamp:string):void {
-
-    this.msg = {text:"Revoking signing authorization..",level:"alert-info"};
-    this.chainService.revoke_signing_authority(this.authorizations[authorizationIdx].AccreditationID,this.authorizations[authorizationIdx].AuthorizedParty,timestamp).then(result => {
-
-      this.msg = {text:result,level:"alert-success"};
-    }).catch(reason => {
-      this.msg = {text:reason.toString(),level:"alert-danger"};
-    });
-  }
 }
