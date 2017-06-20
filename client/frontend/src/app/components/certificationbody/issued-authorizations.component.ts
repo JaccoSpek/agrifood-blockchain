@@ -36,4 +36,15 @@ export class IssuedAuthorizationsComponent extends AppComponent{
     });
   }
 
+  revoke_authorization(authorization:Authorization):void {
+    let now = new Date();
+    this.msg = {text:"Revoking signing authorization..",level:"alert-info"};
+    this.chainService.revoke_signing_authority(authorization.AccreditationID,authorization.AuthorizedParty,now.toISOString()).then(result => {
+      this.msg = {text:result,level:"alert-success"};
+      this.OnInitialized();
+    }).catch(reason => {
+      this.msg = {text:reason.toString(),level:"alert-danger"};
+    });
+  }
+
 }

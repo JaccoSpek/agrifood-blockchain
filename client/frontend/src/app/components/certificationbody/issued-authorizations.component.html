@@ -7,7 +7,6 @@
     <thead>
     <tr>
       <th>Authorized Party</th>
-      <th>Certification body</th>
       <th>AccreditationID</th>
       <th>Expires</th>
       <th>Revoked</th>
@@ -17,11 +16,13 @@
     <tbody>
     <tr *ngFor="let authorization of authorizations">
       <td>{{authorization.AuthorizedParty}}</td>
-      <td>{{authorization.CertifyingParty}}</td>
       <td [ngClass]="authorization.Accreditation && authorization.Accreditation.Revoked ? 'danger' : 'success'">{{authorization.AccreditationID}} <span *ngIf="authorization.Accreditation && authorization.Accreditation.Revoked">(revoked)</span></td>
       <td>{{authorization.Expires}}</td>
       <td [ngClass]="authorization.Revoked ? 'danger' : 'success'">{{authorization.Revoked}}</td>
-      <td><span *ngIf="authorization.Revoked">{{authorization.RevocationTimestamp}}</span></td>
+      <td>
+        <span *ngIf="authorization.Revoked">{{authorization.RevocationTimestamp}}</span>
+        <button *ngIf="!authorization.Revoked" type="button" class="btn btn-danger" (click)="revoke_authorization(authorization)">Revoke authorization now</button>
+      </td>
     </tr>
     </tbody>
   </table>

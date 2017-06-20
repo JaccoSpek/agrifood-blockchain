@@ -23,13 +23,11 @@ export class TransferGrapesComponent extends AppComponent {
     // get traders
     this.chainService.get_role_parties("Trader").then(result => {
       this.traders = result as string[];
-      console.log(this.traders);
     });
 
     // get grapes owned by party
     this.chainService.get_own_grapes().then(result => {
       this.grapeAssets = result as GrapeAsset[];
-      console.log(this.grapeAssets);
     });
 
     // set current timestamp

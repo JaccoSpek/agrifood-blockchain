@@ -3,7 +3,7 @@
   <div class="alert" [ngClass]="msg.level" *ngIf="msg">
     <strong>{{msg.text}}</strong>
   </div>
-  <table class="table table-bordered" *ngIf="grapeAssets && grapeAssets.length > 0">
+  <table class="table table-bordered" *ngIf="produced_grapeAssets && produced_grapeAssets.length > 0">
     <thead>
     <tr>
       <th>UUID</th>
@@ -14,7 +14,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let grapeAsset of grapeAssets">
+    <tr *ngFor="let grapeAsset of produced_grapeAssets">
       <td>{{grapeAsset.UUID}}</td>
       <td>{{grapeAsset.Producer}}</td>
       <td>{{grapeAsset.Created}}</td>
@@ -22,6 +22,14 @@
         <ul class="list-group" *ngIf="grapeAsset.AccreditationSignatures && grapeAsset.AccreditationSignatures.length > 0">
           <li class="list-group-item" *ngFor="let sig of grapeAsset.AccreditationSignatures" [ngClass]="sig.Valid ? 'list-group-item-success' : 'list-group-item-danger'">{{sig.AccreditationID}}</li>
         </ul>
+        <div class="form-group" *ngIf="authorizations">
+          <select id="authorization" class="form-control" [(ngModel)]="grapeAsset.selectedAccreditation">
+            <option *ngFor="let authorization of authorizations" [value]="authorization.AccreditationID">{{authorization.AccreditationID}}</option>
+          </select>
+        </div>
+        <div class="form-group" *ngIf="grapeAsset.selectedAccreditation">
+          <button type="button" class="btn btn-success" (click)="certify_asset(grapeAsset.UUID,grapeAsset.selectedAccreditation)">Certify grape asset</button>
+        </div>
       </td>
       <td>
         <ul class="list-group" *ngIf="grapeAsset.Ownership && grapeAsset.Ownership.length > 0">
