@@ -13,7 +13,7 @@
     <label for="revocation_timestamp">Revocation timestamp:</label>
     <input type="text" class="form-control" id="revocation_timestamp" [(ngModel)]="revocation_timestamp">
   </div>
-  <div class="form-group">
+  <div class="form-group" *ngIf="selectedAuthorization">
     <button type="button" class="btn btn-danger" (click)="revoke_authorization(selectedAuthorization,revocation_timestamp)">Revoke authorization</button>
   </div>
 </div>

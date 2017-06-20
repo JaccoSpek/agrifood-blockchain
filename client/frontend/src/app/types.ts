@@ -10,7 +10,7 @@ export class CcRole {
 
 export class Accreditation {
   ID:string;
-  description:string;
+  Description:string;
   AccreditationBody:string;
   CertificationBody:string;
   Created:string;

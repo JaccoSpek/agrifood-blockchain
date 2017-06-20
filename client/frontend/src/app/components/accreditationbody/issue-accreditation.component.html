@@ -15,7 +15,7 @@
       <option *ngFor="let cert_body of cert_bodies" [value]="cert_body">{{cert_body}}</option>
     </select>
   </div>
-  <div class="form-group">
+  <div class="form-group" *ngIf="selectedAccreditation && selectedCB">
     <button type="button" class="btn btn-success" (click)="issue_accreditation(selectedAccreditation,selectedCB)">Issue accreditation to Certification body</button>
   </div>
 </div>

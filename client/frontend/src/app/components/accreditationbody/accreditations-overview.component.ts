@@ -11,6 +11,7 @@ import {ChainService} from "../../services/chain.service";
 })
 export class AccreditationsOverviewComponent extends AppComponent implements OnInit{
   private accreditations:Accreditation[];
+  private cert_bodies:string[];
   private msg:Message;
 
   constructor(private sharedSrv:SharedService,private chainService:ChainService) {
@@ -24,6 +25,33 @@ export class AccreditationsOverviewComponent extends AppComponent implements OnI
       if(!this.accreditations || (this.accreditations && this.accreditations.length == 0)) {
         this.msg = {text:"No accreditations found", level:"alert-info"}
       }
+    });
+
+    // get certification bodies
+    this.chainService.get_role_parties("CertificationBody").then(result =>{
+      this.cert_bodies = result as string[];
+    });
+  }
+
+  revoke_accreditation(accreditationID:string):void {
+    let now = new Date();
+
+    this.msg = {text:"Revoking accreditation..",level:"alert-info"};
+    this.chainService.revoke_accreditation(accreditationID,now.toISOString()).then(result => {
+      this.msg = {text:result,level:"alert-success"};
+      this.OnInitialized();
+    }).catch(reason => {
+      this.msg = {text:reason.toString(),level:"alert-danger"};
+    });
+  }
+
+  issue_accreditation(accreditation:string,cb:string):void {
+    this.msg = {text:"Issue accreditation..",level:"alert-info"};
+    this.chainService.issue_accreditation(accreditation,cb).then(result => {
+      this.msg = {text:result,level:"alert-success"};
+      this.OnInitialized();
+    }).catch(reason => {
+      this.msg = {text:reason.toString(),level:"alert-danger"};
     });
   }
 

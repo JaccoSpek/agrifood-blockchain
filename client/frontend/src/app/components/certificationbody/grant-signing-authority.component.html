@@ -19,7 +19,7 @@
     <label for="expiration_date">Expiration date:</label>
     <input type="text" class="form-control" id="expiration_date" [(ngModel)]="expiration_date">
   </div>
-  <div class="form-group">
+  <div class="form-group" *ngIf="selectedAccreditation && selectedFarm">
     <button type="button" class="btn btn-success" (click)="grant_signing_authority(selectedAccreditation,selectedFarm,expiration_date)">Grant signing authority to farm</button>
   </div>
 </div>

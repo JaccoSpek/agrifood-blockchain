@@ -17,6 +17,11 @@ export class FarmRoutes extends BaseChainRoute {
             this.certify_grapes(req,res);
         });
 
+        // revoke asset signature
+        this.router.post("/farm/revoke_signature", (req:Request, res:Response) => {
+            this.revoke_signature(req,res);
+        });
+
         // transfer grape assets
         this.router.post("/farm/transfer_grapes", (req:Request, res:Response) => {
             this.transfer_grapes(req,res);
@@ -52,6 +57,26 @@ export class FarmRoutes extends BaseChainRoute {
             } else {
                 let args = [req.body['uuid'],req.body['accr_id'],req.body['timestamp']];
                 this.invokeChaincode(ccID,'certify_grapes',args,user,tcert,(err:Error, result:any)=>{
+                    if(err) {
+                        console.log("Error: %s",err.message);
+                        res.status(400).send(err.message)
+                    } else {
+                        console.log("successfully invoked transaction: %s", result);
+                        res.send("successfully invoked transaction");
+                    }
+                });
+            }
+        });
+    }
+
+    private revoke_signature(req:Request, res:Response):void {
+        this.verifyRequest(req,["uuid","accr_id","timestamp"],(err:Error,user:Member,tcert:TCert,ccID:string)=>{
+            if(err) {
+                console.log("Error: %s",err.message);
+                res.status(400).send(err.message)
+            } else {
+                let args = [req.body['uuid'],req.body['accr_id'],req.body['timestamp']];
+                this.invokeChaincode(ccID,'revoke_signature',args,user,tcert,(err:Error, result:any)=>{
                     if(err) {
                         console.log("Error: %s",err.message);
                         res.status(400).send(err.message)

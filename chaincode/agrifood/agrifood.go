@@ -862,7 +862,7 @@ func (t *AgrifoodChaincode) revoke_signature(stub shim.ChaincodeStubInterface, a
 
 	// Check number of arguments
 	if len(args) != 3 {
-		msg := "Incorrect number of arguments. Expecting 3" // UUID, certificateID, revokeTimestamp
+		msg := "Incorrect number of arguments. Expecting 3" // UUID, accreditationID, revokeTimestamp
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}

@@ -7,6 +7,7 @@
     <thead>
       <tr>
         <th>ID</th>
+        <th>Description</th>
         <th>Certification body</th>
         <th>Created</th>
         <th>Expires</th>
@@ -17,11 +18,27 @@
     <tbody>
       <tr *ngFor="let accreditation of accreditations">
         <td>{{accreditation.ID}}</td>
-        <td>{{accreditation.CertificationBody}}</td>
+        <td>{{accreditation.Description}}</td>
+        <td>
+          <span *ngIf="accreditation.CertificationBody">{{accreditation.CertificationBody}}</span>
+          <div *ngIf="!accreditation.CertificationBody">
+            <div class="form-group">
+              <select  id="cb" class="form-control" [(ngModel)]="accreditation.selectedCB">
+                <option *ngFor="let cert_body of cert_bodies" [value]="cert_body">{{cert_body}}</option>
+              </select>
+            </div>
+            <div *ngIf="accreditation.selectedCB" class="form-group">
+              <button type="button" class="btn btn-success" (click)="issue_accreditation(accreditation.ID,accreditation.selectedCB)">Set</button>
+            </div>
+          </div>
+        </td>
         <td>{{accreditation.Created}}</td>
         <td>{{accreditation.Expires}}</td>
         <td [ngClass]="accreditation.Revoked ? 'danger' : 'success'">{{accreditation.Revoked}}</td>
-        <td><span *ngIf="accreditation.Revoked">{{accreditation.RevocationTimestamp}}</span></td>
+        <td>
+          <span *ngIf="accreditation.Revoked">{{accreditation.RevocationTimestamp}}</span>
+          <button *ngIf="!accreditation.Revoked" type="button" class="btn btn-danger" (click)="revoke_accreditation(accreditation.ID)">Revoke accreditation now</button>
+        </td>
       </tr>
     </tbody>
   </table>
