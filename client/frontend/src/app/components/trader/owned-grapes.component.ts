@@ -11,6 +11,7 @@ import {ChainService} from "../../services/chain.service";
 })
 export class OwnedGrapesComponent extends AppComponent{
   private grapeAssets:GrapeAsset[];
+  private traders:string[];
   private msg:Message;
 
   constructor(private sharedSrv:SharedService,private chainService:ChainService) {
@@ -58,6 +59,26 @@ export class OwnedGrapesComponent extends AppComponent{
           }
         });
       }
+    });
+
+    // get traders
+    this.chainService.get_role_parties("Trader").then(result => {
+      let list = result as string[];
+      this.traders = list.filter(
+        trader => trader!=this.enrolledId
+      );
+    });
+  }
+
+  transfer_asset(grape_asset_UUID:string,trader_ID:string):void {
+    let now:Date = new Date();
+    console.log("Transfer grapes %s to %s at %s",grape_asset_UUID,trader_ID,now.toISOString());
+    this.msg = {text:"Transfer grape asset..",level:"alert-info"};
+    this.chainService.transfer_grapes(grape_asset_UUID,trader_ID,now.toISOString()).then(result => {
+      this.msg = {text:result,level:"alert-success"};
+      this.OnInitialized();
+    }).catch(reason => {
+      this.msg = {text:reason.toString(),level:"alert-danger"};
     });
   }
 

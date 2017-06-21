@@ -12,6 +12,7 @@ import {ChainService} from "../../services/chain.service";
 export class GrapeAssetsComponent extends AppComponent{
   private produced_grapeAssets:GrapeAsset[];
   private authorizations:Authorization[];
+  private traders:string[];
   private msg:Message;
 
   constructor(private sharedSrv:SharedService,private chainService:ChainService) {
@@ -29,7 +30,6 @@ export class GrapeAssetsComponent extends AppComponent{
         let now = Date.now();
         this.produced_grapeAssets.forEach((asset,asset_idx) => {
           // verify signature
-          // TODO: move to AppComponent
           if(asset.AccreditationSignatures && asset.AccreditationSignatures.length > 0){
             asset.AccreditationSignatures.forEach((sig,sig_idx) => {
               if(sig.Revoked){
@@ -59,7 +59,6 @@ export class GrapeAssetsComponent extends AppComponent{
               }
             });
           }
-
         });
       }
 
@@ -80,6 +79,11 @@ export class GrapeAssetsComponent extends AppComponent{
       }
 
     });
+
+    // get traders
+    this.chainService.get_role_parties("Trader").then(result => {
+      this.traders = result as string[];
+    });
   }
 
   certify_asset(grape_asset_UUID:string,accreditation_ID:string):void {
@@ -87,6 +91,18 @@ export class GrapeAssetsComponent extends AppComponent{
     console.log("certify %s with %s at %s",grape_asset_UUID,accreditation_ID,now.toISOString());
     this.msg = {text:"Certify grape asset..",level:"alert-info"};
     this.chainService.certify_grapes(grape_asset_UUID,accreditation_ID,now.toISOString()).then(result => {
+      this.msg = {text:result,level:"alert-success"};
+      this.OnInitialized();
+    }).catch(reason => {
+      this.msg = {text:reason.toString(),level:"alert-danger"};
+    });
+  }
+
+  transfer_asset(grape_asset_UUID:string,trader_ID:string):void {
+    let now:Date = new Date();
+    console.log("Transfer grapes %s to %s at %s",grape_asset_UUID,trader_ID,now.toISOString());
+    this.msg = {text:"Transfer grape asset..",level:"alert-info"};
+    this.chainService.transfer_grapes(grape_asset_UUID,trader_ID,now.toISOString()).then(result => {
       this.msg = {text:result,level:"alert-success"};
       this.OnInitialized();
     }).catch(reason => {
