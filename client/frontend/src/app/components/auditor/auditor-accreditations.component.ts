@@ -27,4 +27,16 @@ export class AuditorAccreditationsComponent extends AppComponent implements OnIn
     });
   }
 
+  revoke_accreditation(accreditationID:string):void {
+    let now = new Date();
+
+    this.msg = {text:"Revoking accreditation..",level:"alert-info"};
+    this.chainService.revoke_accreditation(accreditationID,now.toISOString()).then(result => {
+      this.msg = {text:result,level:"alert-success"};
+      this.OnInitialized();
+    }).catch(reason => {
+      this.msg = {text:reason.toString(),level:"alert-danger"};
+    });
+  }
+
 }

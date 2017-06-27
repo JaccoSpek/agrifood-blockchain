@@ -21,7 +21,10 @@
       <td>{{accreditation.Created}}</td>
       <td>{{accreditation.Expires}}</td>
       <td [ngClass]="accreditation.Revoked ? 'danger' : 'success'">{{accreditation.Revoked}}</td>
-      <td><span *ngIf="accreditation.Revoked">{{accreditation.RevocationTimestamp}}</span></td>
+      <td>
+        <span *ngIf="accreditation.Revoked">{{accreditation.RevocationTimestamp}}</span>
+        <button *ngIf="!accreditation.Revoked" type="button" class="btn btn-danger" (click)="revoke_accreditation(accreditation.ID)">Revoke accreditation now</button>
+      </td>
     </tr>
     </tbody>
   </table>

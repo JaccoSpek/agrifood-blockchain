@@ -39,6 +39,9 @@ export class ChaincodeIdComponent implements OnInit {
   update():void {
     if(this.newCcId != null){
       this.sharedService.setKey("chaincodeID",this.newCcId);
+      this.chainService.set_ccid(this.newCcId).then((result:string) => {
+        console.log(result);
+      });
     }
   }
 

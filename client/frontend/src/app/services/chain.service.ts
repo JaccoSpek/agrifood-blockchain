@@ -70,6 +70,19 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
+  set_ccid(ccid:string): Promise<string> {
+    let url = `${this.apiURL}/ccid`;
+
+    let args = {
+      chaincodeID:ccid
+    };
+
+    return this.http.post(url, args, this.opts)
+      .toPromise()
+      .then(response => response.text() as string)
+      .catch(ChainService.handleError);
+  }
+
   get_caller_role(): Promise<CcRole> {
     let url = `${this.apiURL}/role`;
 

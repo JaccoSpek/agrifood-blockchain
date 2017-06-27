@@ -20,7 +20,7 @@ services:
       - ./chaincode:/go/src/tno.nl/chaincode
       # Webserver volumes
       - ./webserver/app:/usr/app
-      #- ./webserver/tmp/keyValStore:/tmp/keyValStore
+      # - ./webserver/tmp/keyValStore:/tmp/keyValStore
     links:
       - membersrvc
       - vp0

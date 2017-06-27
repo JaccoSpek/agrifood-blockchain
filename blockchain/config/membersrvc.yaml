@@ -115,13 +115,9 @@ eca:
                 # Users for asset transfer with roles test located at
                 # sdk/node/test/unit/asset-mgmt-with-roles.js
                 alice: 1 CMS10pEQlB16 institution_a
-                #bob: 1 NOE63pEQbL25 institution_a
                 bob: 1 CMS10pEQlB16 institution_a
-                #carol: 1 NPKYL39uKbkj institution_a
                 carol: 1 CMS10pEQlB16 institution_a
-                #steve: 1 DRJ23pEQl16a institution_a
                 steve: 1 CMS10pEQlB16 institution_a
-                #frank: 1 6avZQLwcUe9b institution_a
                 frank: 1 CMS10pEQlB16 institution_a
                 bill: 1 CMS10pEQlB16 institution_a
                 carlos: 1 CMS10pEQlB16 institution_a
