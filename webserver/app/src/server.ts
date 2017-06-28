@@ -9,6 +9,7 @@ import {Chain} from "hfc/lib/hfc";
 
 import errorHandler = require("errorhandler");
 import methodOverride = require("method-override");
+import MariaSql = require("mariasql");
 
 import { EnrollRoutes } from "./routes/enroll-routes";
 import { ChaincodeRoutes } from "./routes/chaincode-routes";

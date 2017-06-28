@@ -1,5 +1,19 @@
 version: '2'
 services:
+  # mariaDB server
+  database-server:
+    image: mariadb
+    restart: always
+    volumes:
+      - ./mysql/database:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: test
+      MYSQL_DATABASE: database
+    ports:
+      - "3306:3306"
+
   # webserver to interact with blockchain
   blockchain-sever:
     container_name: webserver
