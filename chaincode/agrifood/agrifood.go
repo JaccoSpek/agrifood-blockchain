@@ -1262,6 +1262,8 @@ func (t *AgrifoodChaincode) Query(stub shim.ChaincodeStubInterface, function str
 		return t.get_created_grapes(stub, args)
 	} else if function == "get_own_grapes" {
 		return t.get_own_grapes(stub)
+	} else if function == "get_all_grapes" {
+		return t.get_all_grapes(stub)
 	}
 
 	myLogger.Errorf("Received unknown query function: %s", function)
@@ -1856,6 +1858,25 @@ func (t *AgrifoodChaincode) get_own_grapes(stub shim.ChaincodeStubInterface) ([]
 
 	myLogger.Infof("Return grapes owned by %s", party.ID)
 	return party_grapes_b,nil
+}
+
+func (t *AgrifoodChaincode) get_all_grapes(stub shim.ChaincodeStubInterface) ([]byte, error) {
+	grapes, err := t.getGrapes(stub)
+	if err != nil {
+		msg := fmt.Sprintf("Error retrieving grapes: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	grapes_b, err := json.Marshal(grapes)
+	if err != nil {
+		msg := fmt.Sprintf("Error marshalling grapes: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+
+	myLogger.Infof("Return all grapes")
+	return grapes_b,nil
 }
 
 // get specific grape unit

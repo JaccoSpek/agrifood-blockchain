@@ -1,17 +1,16 @@
-import {Component}    from '@angular/core';
+import { Component }    from '@angular/core';
 import { AppComponent } from "../../app.component";
 import {Accreditation, Authorization, GrapeAsset, Message} from "../../types";
-import {SharedService} from "../../services/shared.service";
 import {ChainService} from "../../services/chain.service";
+import {SharedService} from "../../services/shared.service";
 
 @Component({
   moduleId: module.id,
-  selector: 'owned-grapes',
-  templateUrl: 'owned-grapes.component.html'
+  selector: 'grape-ownership-trail',
+  templateUrl: 'grapes-overview.component.html'
 })
-export class OwnedGrapesComponent extends AppComponent{
+export class GrapesOverviewComponent extends AppComponent {
   private grapeAssets:GrapeAsset[];
-  private traders:string[];
   private msg:Message;
 
   constructor(private sharedSrv:SharedService,private chainService:ChainService) {
@@ -19,9 +18,10 @@ export class OwnedGrapesComponent extends AppComponent{
   };
 
   OnInitialized():void {
-    this.chainService.get_own_grapes().then(result => {
+    this.chainService.get_all_grapes().then(result =>{
       this.grapeAssets = result as GrapeAsset[];
 
+      // check if there are grapes
       if(!this.grapeAssets || (this.grapeAssets && this.grapeAssets.length == 0)){
         this.msg = {text:"No grape assets found", level:"alert-info"}
       } else {
@@ -60,26 +60,5 @@ export class OwnedGrapesComponent extends AppComponent{
         });
       }
     });
-
-    // get traders
-    this.chainService.get_role_parties("Trader").then(result => {
-      let list = result as string[];
-      this.traders = list.filter(
-        trader => trader!=this.enrolledId
-      );
-    });
   }
-
-  transfer_asset(grape_asset_UUID:string,trader_ID:string):void {
-    let now:Date = new Date();
-    console.log("Transfer grapes %s to %s at %s",grape_asset_UUID,trader_ID,now.toISOString());
-    this.msg = {text:"Transfer grape asset..",level:"alert-info"};
-    this.chainService.transfer_grapes(grape_asset_UUID,trader_ID,now.toISOString()).then(result => {
-      this.msg = {text:result,level:"alert-success"};
-      this.OnInitialized();
-    }).catch(reason => {
-      this.msg = {text:reason.toString(),level:"alert-danger"};
-    });
-  }
-
 }

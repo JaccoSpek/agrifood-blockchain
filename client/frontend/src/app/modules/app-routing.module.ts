@@ -29,10 +29,7 @@ import { TraderComponent } from '../components/trader/trader.component';
 import { TraderTransferGrapesComponent } from '../components/trader/trader-transfer-grapes.component';
 import { OwnedGrapesComponent } from '../components/trader/owned-grapes.component';
 import { PublicComponent } from '../components/public/public.component';
-import { GrapeOwnerShipTrailComponent } from '../components/public/grape-ownership-trail.component';
-import { GrapeSignaturesComponent } from '../components/public/grape-signatures.component';
-import { SignerCertsComponent } from '../components/public/signer-certs.component';
-
+import { GrapesOverviewComponent } from '../components/public/grapes-overview';
 const routes: Routes = [
   { path: '', redirectTo: '/', pathMatch: 'full' },
   { path: 'admin', component: AdminComponent, children: [
@@ -69,9 +66,7 @@ const routes: Routes = [
     { path: 'transfer_grapes', component: TraderTransferGrapesComponent }
   ]},
   { path: 'public', component: PublicComponent, children:[
-    { path: 'grape_ownership_trail', component: GrapeOwnerShipTrailComponent },
-    { path: 'grape_signatures', component: GrapeSignaturesComponent },
-    { path: 'signer_certs', component: SignerCertsComponent }
+    { path: 'grapes', component: GrapesOverviewComponent }
   ]}
 ];
 

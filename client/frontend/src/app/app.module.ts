@@ -30,9 +30,7 @@ import {AuditorRevokeSignatureComponent} from "./components/auditor/auditor-revo
 import {TraderComponent} from "./components/trader/trader.component";
 import {TraderTransferGrapesComponent} from "./components/trader/trader-transfer-grapes.component";
 import {PublicComponent} from "./components/public/public.component";
-import {GrapeOwnerShipTrailComponent} from "./components/public/grape-ownership-trail.component";
-import {GrapeSignaturesComponent} from "./components/public/grape-signatures.component";
-import {SignerCertsComponent} from "./components/public/signer-certs.component";
+import {GrapesOverviewComponent} from "./components/public/grapes-overview";
 import {AccreditationsOverviewComponent} from "./components/accreditationbody/accreditations-overview.component";
 import {IssuedAccreditationsComponent} from "./components/certificationbody/issued-accreditations.component";
 import {IssuedAuthorizationsComponent} from "./components/certificationbody/issued-authorizations.component";
@@ -72,9 +70,7 @@ import {AuditorAuthorizationsComponent} from "./components/auditor/auditor-autho
     TraderTransferGrapesComponent,
     OwnedGrapesComponent,
     PublicComponent,
-    GrapeOwnerShipTrailComponent,
-    GrapeSignaturesComponent,
-    SignerCertsComponent,
+    GrapesOverviewComponent,
     IssuedAccreditationsComponent,
     IssuedAuthorizationsComponent,
     GrantedAuthorizationsComponent,
