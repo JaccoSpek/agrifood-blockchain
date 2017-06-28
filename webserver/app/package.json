@@ -20,6 +20,7 @@
     "express": "^4.14.1",
     "express-session": "^1.15.1",
     "hfc": "^0.6.5",
+    "mariasql": "^0.2.6",
     "method-override": "^2.3.7",
     "morgan": "^1.8.1",
     "multer": "^1.3.0"
