@@ -13,9 +13,9 @@ export class EnrollRoutes extends BaseChainRoute {
             this.enroll(req, res);
         });
 
-        // logout route
-        this.router.post("/logout", (req:Request, res:Response)=>{
-            this.logout(req,res);
+        // unenroll route
+        this.router.post("/unenroll", (req:Request, res:Response)=>{
+            this.unenroll(req,res);
         });
 
         // add route to check enrollment
@@ -76,7 +76,7 @@ export class EnrollRoutes extends BaseChainRoute {
         }
     }
 
-    private logout(req:Request, res:Response):void {
+    private unenroll(req:Request, res:Response):void {
         if(typeof req.session['enrolledID'] !== 'undefined'){
             req.session['enrolledID'] = null;
         }

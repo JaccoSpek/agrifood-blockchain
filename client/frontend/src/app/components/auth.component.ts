@@ -71,7 +71,7 @@ export class AuthComponent implements OnInit {
       this.sharedService.setKey("enrolledId",null);
       this.sharedService.setKey("role",null);
     }).catch(() => {
-      this.msg = { text: "Failed to logout", level:"alert-danger"};
+      this.msg = { text: "Failed to unenroll", level:"alert-danger"};
     });
   }
 }

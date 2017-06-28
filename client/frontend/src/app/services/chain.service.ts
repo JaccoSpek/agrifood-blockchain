@@ -30,7 +30,7 @@ export class ChainService {
   }
 
   logout(): Promise<boolean> {
-    let url = `${this.apiURL}/logout`;
+    let url = `${this.apiURL}/unenroll`;
 
     return this.http.post(url,{},this.opts)
       .toPromise()

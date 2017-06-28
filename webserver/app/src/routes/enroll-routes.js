@@ -24,9 +24,9 @@ var EnrollRoutes = (function (_super) {
         this.router.post("/enroll", function (req, res) {
             _this.enroll(req, res);
         });
-        // logout route
-        this.router.post("/logout", function (req, res) {
-            _this.logout(req, res);
+        // unenroll route
+        this.router.post("/unenroll", function (req, res) {
+            _this.unenroll(req, res);
         });
         // add route to check enrollment
         this.router.get("/enrollment", function (req, res) {
@@ -88,7 +88,7 @@ var EnrollRoutes = (function (_super) {
             res.status(400).send("Please use correct parameters");
         }
     };
-    EnrollRoutes.prototype.logout = function (req, res) {
+    EnrollRoutes.prototype.unenroll = function (req, res) {
         if (typeof req.session['enrolledID'] !== 'undefined') {
             req.session['enrolledID'] = null;
         }
