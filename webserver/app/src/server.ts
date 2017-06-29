@@ -19,6 +19,7 @@ import { FarmRoutes } from "./routes/farm-routes";
 import { AuditorRoutes } from "./routes/auditor-routes";
 import { TraderRoutes } from "./routes/trader-routes";
 import { PublicRoutes } from "./routes/public-routes";
+import { UserRoutes } from "./routes/user-routes";
 
 export class Server {
     protected chain:Chain;
@@ -101,31 +102,34 @@ export class Server {
         let router: express.Router;
         router = express.Router();
 
-        let enrollRoutes = new EnrollRoutes(router,this.chain);
+        let userRoutes:UserRoutes = new UserRoutes(router);
+        userRoutes.create();
+
+        let enrollRoutes:EnrollRoutes = new EnrollRoutes(router,this.chain);
         enrollRoutes.create();
 
-        let ccRoutes = new ChaincodeRoutes(router,this.chain);
+        let ccRoutes:ChaincodeRoutes = new ChaincodeRoutes(router,this.chain);
         ccRoutes.create();
 
-        let adminRoutes = new AdminRoutes(router, this.chain);
+        let adminRoutes:AdminRoutes = new AdminRoutes(router, this.chain);
         adminRoutes.create();
 
-        let abRoutes = new ABRoutes(router, this.chain);
+        let abRoutes:ABRoutes = new ABRoutes(router, this.chain);
         abRoutes.create();
 
-        let cbRoutes = new CBRoutes(router, this.chain);
+        let cbRoutes:CBRoutes = new CBRoutes(router, this.chain);
         cbRoutes.create();
 
-        let farmRoutes = new FarmRoutes(router, this.chain);
+        let farmRoutes:FarmRoutes = new FarmRoutes(router, this.chain);
         farmRoutes.create();
 
-        let auditorRoutes = new AuditorRoutes(router, this.chain);
+        let auditorRoutes:AuditorRoutes = new AuditorRoutes(router, this.chain);
         auditorRoutes.create();
 
-        let traderRoutes = new TraderRoutes(router, this.chain);
+        let traderRoutes:TraderRoutes = new TraderRoutes(router, this.chain);
         traderRoutes.create();
 
-        let publicRoutes = new PublicRoutes(router, this.chain);
+        let publicRoutes:PublicRoutes = new PublicRoutes(router, this.chain);
         publicRoutes.create();
 
         // Router middleware

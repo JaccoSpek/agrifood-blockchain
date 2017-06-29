@@ -1,16 +1,16 @@
 version: '2'
 services:
   # mariaDB server
-  database-server:
+  mariadb:
     image: mariadb
     restart: always
     volumes:
       - ./mysql/database:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: test
-      MYSQL_DATABASE: database
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=test
+      - MYSQL_DATABASE=wallet_database
     ports:
       - "3306:3306"
 
@@ -29,7 +29,9 @@ services:
       - FRONTEND_ORIGIN=http://bctb1.sensorlab.tno.nl:3000
       - DEPLOY_WAITTIME=30
       - INVOKE_WAITTIME=10
-      - DATABASE=database-server:3306
+      - DATABASE_HOST=mariadb
+      - DATABASE_USER=admin
+      - DATABASE_PASSWORD=test
     volumes:
       # Chaincode volume
       - ./chaincode:/go/src/tno.nl/chaincode
@@ -37,7 +39,7 @@ services:
       - ./webserver/app:/usr/app
       # - ./webserver/tmp/keyValStore:/tmp/keyValStore
     links:
-      - database-server
+      - mariadb
       - membersrvc
       - vp0
     command: sh -c "sleep 10; npm install --loglevel error && npm run grunt serve"

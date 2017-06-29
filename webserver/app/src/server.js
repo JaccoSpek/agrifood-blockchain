@@ -18,6 +18,7 @@ var farm_routes_1 = require("./routes/farm-routes");
 var auditor_routes_1 = require("./routes/auditor-routes");
 var trader_routes_1 = require("./routes/trader-routes");
 var public_routes_1 = require("./routes/public-routes");
+var user_routes_1 = require("./routes/user-routes");
 var Server = (function () {
     function Server() {
         // create expressjs application
@@ -77,6 +78,8 @@ var Server = (function () {
     Server.prototype.api = function () {
         var router;
         router = express.Router();
+        var userRoutes = new user_routes_1.UserRoutes(router);
+        userRoutes.create();
         var enrollRoutes = new enroll_routes_1.EnrollRoutes(router, this.chain);
         enrollRoutes.create();
         var ccRoutes = new chaincode_routes_1.ChaincodeRoutes(router, this.chain);
