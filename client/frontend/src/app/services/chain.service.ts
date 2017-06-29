@@ -13,7 +13,7 @@ export class ChainService {
 
   constructor(private http: Http) {}
 
-  login(enrollId: string, enrollSecret: string): Promise<boolean> {
+  enroll(enrollId: string, enrollSecret: string): Promise<boolean> {
     let url = `${this.apiURL}/enroll`;
 
     let params = {
@@ -29,7 +29,7 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
-  logout(): Promise<boolean> {
+  unenroll(): Promise<boolean> {
     let url = `${this.apiURL}/unenroll`;
 
     return this.http.post(url,{},this.opts)

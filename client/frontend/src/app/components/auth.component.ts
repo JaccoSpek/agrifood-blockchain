@@ -43,30 +43,30 @@ export class AuthComponent implements OnInit {
     timer.subscribe(t => this.getRole());
   }
 
-  private login(enrollId: string, enrollSecret: string): void {
-    console.log("login", enrollId, enrollSecret);
+  private enroll(enrollId: string, enrollSecret: string): void {
+    console.log("enroll", enrollId, enrollSecret);
 
     if(typeof enrollId != "undefined" && typeof enrollSecret != "undefined"){
-      this.msg = { text: "Logging in...", level:"alert-info"};
+      this.msg = { text: "Enrolling...", level:"alert-info"};
       // login
-      this.chainService.login(enrollId,enrollSecret).then((result:any) => {
+      this.chainService.enroll(enrollId,enrollSecret).then((result:any) => {
         this.msg = null;
-        console.log("Login result:",result);
+        console.log("Enrollment result:",result);
         this.enrolledId = result;
         this.sharedService.setKey("enrolledId",result);
       }).catch(() => {
-        this.msg = { text: "Failed to login", level:"alert-danger"};
+        this.msg = { text: "Failed to enroll", level:"alert-danger"};
       });
     } else {
-      this.msg = { text: "Please provide login details", level:"alert-warning"};
+      this.msg = { text: "Please provide enrollment details", level:"alert-warning"};
     }
   }
 
-  private logout():void {
-    console.log("Logout");
+  private unenroll():void {
+    console.log("Unenroll");
 
-    this.chainService.logout().then((result:any) => {
-      console.log("Logout successful");
+    this.chainService.unenroll().then((result:any) => {
+      console.log("Unenrollment successful");
       this.enrolledId = null;
       this.sharedService.setKey("enrolledId",null);
       this.sharedService.setKey("role",null);
