@@ -3,16 +3,16 @@ import Mariadb = require("mariasql");
 
 export class UserRoutes {
     private router:Router;
-    private db_client;
+    private db_config;
 
 
     constructor(router:Router){
         this.router = router;
-        this.db_client = new Mariadb({
+        this.db_config = {
             host: process.env.DATABASE_HOST,
             user: process.env.DATABASE_USER,
             password: process.env.DATABASE_PASSWORD
-        });
+        };
     }
 
     public create():void {
@@ -25,14 +25,21 @@ export class UserRoutes {
     }
 
     private login(req:Request,res:Response):void {
-        console.log("Login");
-        this.db_client.query('SHOW DATABASES', null, {useArray:true}, (err:Error, rows:any) => {
-            if(err){
-                throw err;
-            } else {
-                console.log(rows);
-            }
-        });
+        console.log("Login..");
+        try{
+            let client = new Mariadb(this.db_config);
+            client.query('SHOW DATABASES', null, {useArray:true}, (err:Error, rows:any) => {
+                if(err){
+                    throw err;
+                } else {
+                    console.log(rows);
+                }
+            });
+            client.end();
+        }
+        catch (err){
+            console.log("Error:",err)
+        }
         res.send(true);
     }
 }
