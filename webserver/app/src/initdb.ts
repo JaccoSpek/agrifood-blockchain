@@ -1,4 +1,5 @@
 import Mariadb = require("mariasql");
+import FS = require("fs");
 
 console.log("Verifying wallet database state..");
 try{
@@ -39,8 +40,43 @@ try{
                                 }
 
                                 if(!users_table || !identities_table) {
-                                    console.log("not all tables found, create table..");
-                                    // TODO: load init sql script
+                                    console.log("not all tables found, load init script..");
+                                    // load init sql script
+                                    FS.readFile(process.env.INIT_SQL_FILE,'utf8',(err:Error,initSQL:string)=>{
+                                        if(err){
+                                            throw err;
+                                        } else {
+                                            // Execute init script
+                                            console.log("execute init script..");
+                                            // split file into array with statements
+                                            let queries = initSQL.split(/;[\r\n]*/);
+
+                                            // filter out empty queries
+                                            queries = queries.filter((query) => {
+                                                return query.length > 1;
+                                            });
+
+                                            // TODO: now execute queries
+                                            /*
+                                            queries.forEach(query => {
+                                                client.query(query, null, (err:Error, result:any) => {
+                                                    if(err){
+                                                        throw err;
+                                                    } else {
+                                                        console.log("Successfully executed query");
+                                                    }
+                                                });
+                                            });
+                                            */
+                                            execQueries(queries,0,(err)=>{
+                                                if(err){
+                                                    console.log("Error: %s",err);
+                                                } else {
+                                                    console.log("Successfully executed queries");
+                                                }
+                                            });
+                                        }
+                                    });
                                 } else {
                                     console.log("tables exists, exit");
                                 }
@@ -56,4 +92,38 @@ try{
 }
 catch (err){
     console.log("Error:",err);
+}
+
+function execQueries(queries:any[], idx:number, cb:Function):void {
+    if(queries.length > idx){
+        try{
+            // mysql client
+            let client = new Mariadb({
+                host: process.env.DATABASE_HOST,
+                user: process.env.DATABASE_USER,
+                password: process.env.DATABASE_PASSWORD,
+                db: process.env.DATABASE_NAME
+            });
+
+            //console.log("run query %d",idx);
+            client.query(queries[idx],null,(err:Error, result:any) => {
+                client.end();
+                if(err){
+                    throw err;
+                } else {
+                    // run next query:
+                    //console.log("finished query %d",idx);
+                    execQueries(queries,idx+1,cb);
+                }
+            });
+        } catch (err){
+            let msg:string = "Initialization failed: " + err.toString();
+            console.log(msg);
+            cb(new Error(msg));
+        }
+    } else {
+        // done, run callback
+        //console.log("done");
+        cb(null);
+    }
 }

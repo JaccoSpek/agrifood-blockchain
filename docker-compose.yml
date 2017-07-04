@@ -34,6 +34,7 @@ services:
       - DATABASE_USER=admin
       - DATABASE_PASSWORD=6avZQLwcUe9b
       - DATABASE_NAME=wallet
+      - INIT_SQL_FILE=/mysql/scripts/init.sql
     volumes:
       # Chaincode volume
       - ./chaincode:/go/src/tno.nl/chaincode

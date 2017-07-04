@@ -1,15 +1,12 @@
-use wallet;
-
-CREATE TABLE Users (
-    ID int not null AUTO_INCREMENT PRIMARY KEY,
-    USERNAME varchar(50) not null,
-    PASSHASH varchar(255) not null,
-    PASSALT varchar(255) not null
+CREATE TABLE IF NOT EXISTS Users (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    passhash VARCHAR(255) NOT NULL,
+    passalt VARCHAR(255) NOT NULL
 );
-
-CREATE TABLE Identities (
-    USER_ID int not null,
-    IDENTITY varchar(255) not null,
-    PRIMARY KEY (USER_ID,IDENTITY),
-    FOREIGN KEY (USER_ID) REFERENCES Users(ID)
+CREATE TABLE IF NOT EXISTS Identities (
+    userId INT NOT NULL,
+    identity VARCHAR(255) NOT NULL,
+    PRIMARY KEY(userId, identity),
+    FOREIGN KEY (userId) REFERENCES Users(id)
 );
