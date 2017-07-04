@@ -1,5 +1,6 @@
 import Mariadb = require("mariasql");
 import FS = require("fs");
+import * as bcrypt from 'bcrypt-nodejs';
 
 console.log("Verifying wallet database state..");
 try{
@@ -28,10 +29,10 @@ try{
                                 let identities_table:boolean = false;
                                 if(rows && rows.length > 0) {
                                     rows.forEach(row => {
-                                       if(row == 'Users') {
+                                       if(row == 'users') {
                                            console.log("users table found");
                                            users_table = true;
-                                       } else if(row == 'Identities'){
+                                       } else if(row == 'identities'){
                                            console.log("identities table found");
                                            identities_table = true;
                                        }
@@ -56,23 +57,24 @@ try{
                                                 return query.length > 1;
                                             });
 
-                                            // TODO: now execute queries
-                                            /*
-                                            queries.forEach(query => {
-                                                client.query(query, null, (err:Error, result:any) => {
-                                                    if(err){
-                                                        throw err;
-                                                    } else {
-                                                        console.log("Successfully executed query");
-                                                    }
-                                                });
-                                            });
-                                            */
+                                            // now execute queries
                                             execQueries(queries,0,(err)=>{
                                                 if(err){
-                                                    console.log("Error: %s",err);
+                                                    throw err;
                                                 } else {
                                                     console.log("Successfully executed queries");
+
+                                                    //  populate users table with admin
+                                                    client.query('INSERT INTO users (username, passhash) VALUES(:username, :passhash)', {
+                                                            username: process.env.ADMIN_USERNAME,
+                                                            passhash: bcrypt.hashSync(process.env.ADMIN_PASSWORD)
+                                                        }, (err:Error) => {
+                                                            if(err){
+                                                                throw err
+                                                            } else {
+                                                                console.log("Successfully created user");
+                                                            }
+                                                        });
                                                 }
                                             });
                                         }
