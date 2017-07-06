@@ -1,6 +1,7 @@
 import Mariadb = require("mariasql");
 import FS = require("fs");
 import * as bcrypt from 'bcrypt-nodejs';
+import { Wallet } from './wallet/wallet'
 
 console.log("Verifying wallet database state..");
 try{
@@ -62,18 +63,15 @@ try{
                                                 if(err){
                                                     throw err;
                                                 } else {
-                                                    console.log("Successfully executed queries");
+                                                    console.log("Successfully executed queries, insert user..");
 
-                                                    //  populate users table with admin
-                                                    client.query('INSERT INTO users (username, passhash) VALUES(:username, :passhash)', {
-                                                            username: process.env.ADMIN_USERNAME,
-                                                            passhash: bcrypt.hashSync(process.env.ADMIN_PASSWORD)
-                                                        }, (err:Error) => {
-                                                            if(err){
-                                                                throw err
-                                                            } else {
-                                                                console.log("Successfully created user");
-                                                            }
+                                                    let wallet:Wallet = new Wallet();
+                                                    wallet.addUser(process.env.ADMIN_USERNAME,process.env.ADMIN_PASSWORD,"admin")
+                                                        .then(result => {
+                                                            console.log("Successfully added user");
+                                                        })
+                                                        .catch(err => {
+                                                            console.log("Error creating user: %s",err.toString());
                                                         });
                                                 }
                                             });

@@ -8,6 +8,9 @@ module.exports = function(grunt) {
                 dest: "./dist",
                 options: {
                     fast: 'never'
+                },
+                tsconfig: {
+                    tsconfig: "./tsconfig.json"
                 }
             }
         },

@@ -6,11 +6,10 @@ services:
     restart: always
     volumes:
       - ./mysql/database:/var/lib/mysql
-      - ./mysql/scripts:/mysql/scripts
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=admin
-      - MYSQL_PASSWORD=6avZQLwcUe9b
+      - MYSQL_PASSWORD=admin
       - MYSQL_DATABASE=wallet
     ports:
       - "3306:3306"
@@ -32,7 +31,7 @@ services:
       - INVOKE_WAITTIME=10
       - DATABASE_HOST=mariadb
       - DATABASE_USER=admin
-      - DATABASE_PASSWORD=6avZQLwcUe9b
+      - DATABASE_PASSWORD=admin
       - DATABASE_NAME=wallet
       - INIT_SQL_FILE=/mysql/scripts/init.sql
       - ADMIN_USERNAME=admin

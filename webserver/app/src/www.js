@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var server_1 = require("./server");
-var http = require("http");
-var debug = require("debug");
-var httpPort = normalizePort(process.env.PORT || 8080);
-var app = server_1.Server.bootstrap().app;
+const server_1 = require("./server");
+const http = require("http");
+const debug = require("debug");
+let httpPort = normalizePort(process.env.PORT || 8080);
+let app = server_1.Server.bootstrap().app;
 app.set("port", httpPort);
-var httpServer = http.createServer(app);
+let httpServer = http.createServer(app);
 //listen on provided ports
 httpServer.listen(httpPort);
 //add error handler
@@ -17,7 +17,7 @@ httpServer.on("listening", onListening);
  * Normalize a port into a number, string, or false.
  */
 function normalizePort(val) {
-    var port = Number(val);
+    let port = Number(val);
     if (isNaN(port)) {
         // named pipe
         return val;
@@ -32,7 +32,7 @@ function onError(error) {
     if (error.syscall !== "listen") {
         throw error;
     }
-    var bind = typeof httpPort === "string"
+    let bind = typeof httpPort === "string"
         ? "Pipe " + httpPort
         : "Port " + httpPort;
     // handle specific listen errors with friendly messages
@@ -53,8 +53,8 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 function onListening() {
-    var addr = httpServer.address();
-    var bind = typeof addr === "string"
+    let addr = httpServer.address();
+    let bind = typeof addr === "string"
         ? "pipe " + addr
         : "port " + addr.port;
     debug("Listening on " + bind);
