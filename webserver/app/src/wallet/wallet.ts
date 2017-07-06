@@ -15,7 +15,7 @@ export class Wallet {
 
     public addUser(username:string, password:string, role:string):Promise<boolean> {
         return new Promise((resolve,reject) => {
-            try{
+            try {
                 let client = new Mariadb(this.dbConfig);
 
                 client.query('INSERT INTO users (username, passhash, role) VALUES(:username, :passhash, :role)', {
@@ -28,6 +28,65 @@ export class Wallet {
                         throw err
                     } else {
                         resolve(true);
+                    }
+                });
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    // verify user
+    public verifyUser(username:string, password:string):Promise<boolean>{
+        return new Promise((resolve, reject) =>{
+            try {
+                let client = new Mariadb(this.dbConfig);
+
+                client.query('SELECT id,passhash FROM users WHERE username=:username',{
+                    username: username
+                }, (err:Error,result:any[]) => {
+                    client.end();
+                    if(err){
+                        throw err;
+                    } else {
+                        // verify user
+                        if(result.length) { //user found
+                            // verify password
+                            if(bcrypt.compareSync(password,result[0].passhash)){
+                                // password correct
+                                resolve(true);
+                            } else {
+                                // password incorrect
+                                resolve(false);
+                            }
+                        } else { // user not found
+                            resolve(false);
+                        }
+                    }
+                });
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    // get user role
+    public getUserRole(username:string):Promise<string> {
+        return new Promise((resolve,reject) => {
+            try {
+                let client = new Mariadb(this.dbConfig);
+
+                client.query('SELECT id,role FROM users WHERE username=:username',{
+                    username: username
+                },(err:Error,result:any[])=>{
+                    if(err){
+                        throw err;
+                    } else {
+                        if(result.length) {
+                            resolve(result[0].role);
+                        } else {
+                            reject(new Error("User not found"));
+                        }
                     }
                 });
             } catch (err) {
