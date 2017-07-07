@@ -17,7 +17,7 @@ export abstract class BaseChainRoute {
     protected abstract create():void
 
     protected verifyUser(req:Request,cb:Function):void {
-        // check if user is logged in
+        // check if user is enrolled in
         if(typeof req.session['enrolledID'] !== 'undefined' && req.session['enrolledID'] !== null){
             // get user object from chain
             this.chain.getMember(req.session['enrolledID'],(err:Error, user:Member)=>{
@@ -42,7 +42,7 @@ export abstract class BaseChainRoute {
                 }
             });
         } else {
-            cb(new Error("Please login first"))
+            cb(new Error("Please enroll first!"))
         }
     }
 

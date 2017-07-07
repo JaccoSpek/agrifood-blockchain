@@ -20,6 +20,7 @@ import { AuditorRoutes } from "./routes/auditor-routes";
 import { TraderRoutes } from "./routes/trader-routes";
 import { PublicRoutes } from "./routes/public-routes";
 import { UserRoutes } from "./routes/user-routes";
+import { AuthRoutes } from "./routes/auth-routes";
 
 export class Server {
     protected chain:Chain;
@@ -102,6 +103,9 @@ export class Server {
         let router: express.Router;
         router = express.Router();
 
+        let authRoutes:AuthRoutes = new AuthRoutes(router);
+        authRoutes.create();
+
         let userRoutes:UserRoutes = new UserRoutes(router);
         userRoutes.create();
 
@@ -132,7 +136,7 @@ export class Server {
         let publicRoutes:PublicRoutes = new PublicRoutes(router, this.chain);
         publicRoutes.create();
 
-        // Router middleware
+        // Router middleware..
         this.app.use(router);
     }
 }

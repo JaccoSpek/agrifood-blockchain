@@ -19,6 +19,7 @@ const auditor_routes_1 = require("./routes/auditor-routes");
 const trader_routes_1 = require("./routes/trader-routes");
 const public_routes_1 = require("./routes/public-routes");
 const user_routes_1 = require("./routes/user-routes");
+const auth_routes_1 = require("./routes/auth-routes");
 class Server {
     static bootstrap() {
         return new Server();
@@ -78,6 +79,8 @@ class Server {
     api() {
         let router;
         router = express.Router();
+        let authRoutes = new auth_routes_1.AuthRoutes(router);
+        authRoutes.create();
         let userRoutes = new user_routes_1.UserRoutes(router);
         userRoutes.create();
         let enrollRoutes = new enroll_routes_1.EnrollRoutes(router, this.chain);
@@ -98,7 +101,7 @@ class Server {
         traderRoutes.create();
         let publicRoutes = new public_routes_1.PublicRoutes(router, this.chain);
         publicRoutes.create();
-        // Router middleware
+        // Router middleware..
         this.app.use(router);
     }
 }

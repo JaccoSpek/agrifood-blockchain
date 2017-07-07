@@ -8,7 +8,7 @@ class BaseChainRoute {
         this.store = this.chain.getKeyValStore();
     }
     verifyUser(req, cb) {
-        // check if user is logged in
+        // check if user is enrolled in
         if (typeof req.session['enrolledID'] !== 'undefined' && req.session['enrolledID'] !== null) {
             // get user object from chain
             this.chain.getMember(req.session['enrolledID'], (err, user) => {
@@ -34,7 +34,7 @@ class BaseChainRoute {
             });
         }
         else {
-            cb(new Error("Please login first"));
+            cb(new Error("Please enroll first!"));
         }
     }
     verifyRequest(req, requiredParams, cb) {
