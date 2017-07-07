@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS users (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
     passhash VARCHAR(100) NOT NULL,
     role VARCHAR(10) NOT NULL
 );
 CREATE TABLE IF NOT EXISTS identities (
     userId INT NOT NULL,
-    identity VARCHAR(255) NOT NULL,
+    identity VARCHAR(255) NOT NULL UNIQUE,
     PRIMARY KEY(userId, identity),
     FOREIGN KEY (userId) REFERENCES users(id)
 );

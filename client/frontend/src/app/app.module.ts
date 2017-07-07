@@ -8,8 +8,8 @@ import { SharedService }    from './services/shared.service';
 import { ChainService }     from './services/chain.service';
 import { AppRoutingModule } from './modules/app-routing.module';
 
-import { AuthComponent } from './components/auth.component';
-import { ChaincodeIdComponent } from './components/chaincode-id.component';
+import { EnrollComponent } from './components/chaincode/enroll.component';
+import { ChaincodeIdComponent } from './components/chaincode/chaincode-id.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { AddPartyComponent } from "./components/admin/add-party.component";
 import { AccreditationbodyComponent } from "./components/accreditationbody/accreditationbody.component";
@@ -44,7 +44,7 @@ import {AuditorAuthorizationsComponent} from "./components/auditor/auditor-autho
   imports:      [ BrowserModule, HttpModule, FormsModule, AppRoutingModule ],
   declarations: [
     AppComponent,
-    AuthComponent,
+    EnrollComponent,
     ChaincodeIdComponent,
     AdminComponent,
     AddPartyComponent,

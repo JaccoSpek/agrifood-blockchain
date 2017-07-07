@@ -1,17 +1,17 @@
 import { Component, OnInit }    from '@angular/core';
 import { Observable }         from 'rxjs/Rx';
 
-import { Message,CcRole } from '../types';
+import { Message,CcRole } from '../../types';
 
-import { SharedService } from '../services/shared.service';
-import { ChainService }   from '../services/chain.service';
+import { SharedService } from '../../services/shared.service';
+import { ChainService }   from '../../services/chain.service';
 
 @Component({
   moduleId: module.id,
-  selector: 'auth',
-  templateUrl: 'auth.component.html'
+  selector: 'enroll',
+  templateUrl: 'enroll.component.html'
 })
-export class AuthComponent implements OnInit {
+export class EnrollComponent implements OnInit {
   enrolledId:string;
   msg:Message;
   role:CcRole;
@@ -31,7 +31,7 @@ export class AuthComponent implements OnInit {
   ngOnInit(): void {
     this.chainService.get_enrollment().then(result => {
       if(result != "false"){
-        console.log("Logged in as:",result);
+        console.log("Enrolled in as:",result);
         this.enrolledId = result;
         this.sharedService.setKey("enrolledId",result);
       } else {

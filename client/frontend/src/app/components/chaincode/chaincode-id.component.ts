@@ -1,10 +1,10 @@
 import { Component, OnInit }    from '@angular/core';
 import { Observable }         from 'rxjs/Rx';
 
-import { Message } from '../types';
+import { Message } from '../../types';
 
-import { SharedService }   from '../services/shared.service';
-import { ChainService }   from '../services/chain.service';
+import { SharedService }   from '../../services/shared.service';
+import { ChainService }   from '../../services/chain.service';
 
 @Component({
   moduleId: module.id,

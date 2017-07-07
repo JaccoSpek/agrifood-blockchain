@@ -94,4 +94,14 @@ export class Wallet {
             }
         });
     }
+
+    public addIdentity(username:string, identity:string):Promise<boolean>{
+        return new Promise((resolve, reject) => {
+            try {
+                let client = new Mariadb(this.dbConfig);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
 }
