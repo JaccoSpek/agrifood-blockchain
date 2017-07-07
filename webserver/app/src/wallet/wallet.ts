@@ -127,7 +127,7 @@ export class Wallet {
             try {
                 let client = new Mariadb(this.dbConfig);
 
-                client.query('SELECT users.username, identities.identity FROM identities,users WHERE users.id = identities.user_id',null,{useArray:false},(err:Error,result:any[]) => {
+                client.query('SELECT users.username, identities.identity FROM identities,users WHERE users.id = identities.user_id',null,(err:Error,result:any[]) => {
                     if(err){
                         throw err;
                     } else {
@@ -138,5 +138,25 @@ export class Wallet {
                 reject(err);
             }
         });
+    }
+
+    public getUserIdentities(username:string):Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            try {
+                let client = new Mariadb(this.dbConfig);
+
+                client.query('SELECT identities.identity FROM identities,users WHERE users.id = identities.user_id AND users.username=:username',{
+                    username:username
+                },(err:Error,result:any[]) => {
+                    if(err){
+                        throw err;
+                    } else {
+                        resolve(result);
+                    }
+                })
+            } catch (err) {
+                reject(err);
+            }
+        })
     }
 }

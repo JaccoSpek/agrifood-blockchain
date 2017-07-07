@@ -24,6 +24,10 @@ export class AuthRoutes {
         this.router.get('/auth/status', (req: Request, res: Response) => {
            this.getAuthStatus(req,res);
         });
+
+        this.router.get('/wallet/roles', (req:Request, res:Response) => {
+            this.getMyRoles(req,res);
+        });
     }
 
     private login(req:Request, res:Response):void {
@@ -69,6 +73,28 @@ export class AuthRoutes {
         if(userName){
             res.send(userName);
         } else {
+            res.status(400).send("not logged in");
+        }
+    }
+
+    private getMyRoles(req:Request, res:Response):void {
+        let user:string = AuthRoutes.authStatus(req);
+        if(user){ // logged in
+            this.wallet.getUserIdentities(user)
+                .then(result => {
+                    let identities:string[] = [];
+
+                    for(let i:number = 0; i < result.length; i++){
+                        identities.push( result[i].identity );
+                    }
+
+                    res.send(identities);
+                })
+                .catch(err => {
+                    // Some error happened
+                    res.status(400).send(err.toString());
+                });
+        } else { // not logged in
             res.status(400).send("not logged in");
         }
     }
