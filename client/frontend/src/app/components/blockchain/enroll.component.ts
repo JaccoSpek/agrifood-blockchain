@@ -12,9 +12,9 @@ import { ChainService }   from '../../services/chain.service';
   templateUrl: 'enroll.component.html'
 })
 export class EnrollComponent implements OnInit {
-  enrolledId:string;
-  msg:Message;
-  role:CcRole;
+  private enrolledId:string;
+  private msg:Message;
+  private role:CcRole;
 
   constructor(private sharedService:SharedService, private chainService:ChainService) {};
 
@@ -48,7 +48,8 @@ export class EnrollComponent implements OnInit {
 
     if(typeof enrollId != "undefined" && typeof enrollSecret != "undefined"){
       this.msg = { text: "Enrolling...", level:"alert-info"};
-      // login
+
+      // enroll
       this.chainService.enroll(enrollId,enrollSecret).then((result:any) => {
         this.msg = null;
         console.log("Enrollment result:",result);
@@ -65,7 +66,7 @@ export class EnrollComponent implements OnInit {
   private unenroll():void {
     console.log("Unenroll");
 
-    this.chainService.unenroll().then((result:any) => {
+    this.chainService.unenroll().then(() => {
       console.log("Unenrollment successful");
       this.enrolledId = null;
       this.sharedService.setKey("enrolledId",null);

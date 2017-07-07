@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_chain_route_1 = require("./base-chain-route");
+const auth_routes_1 = require("./auth-routes");
 class EnrollRoutes extends base_chain_route_1.BaseChainRoute {
     create() {
         //log
@@ -19,7 +20,36 @@ class EnrollRoutes extends base_chain_route_1.BaseChainRoute {
         });
     }
     enroll(req, res) {
-        if (typeof req.body.enrollId !== "undefined" && typeof req.body.enrollSecret !== "undefined") {
+        // verify if user is logged in
+        let wallet_user = auth_routes_1.AuthRoutes.authStatus(req);
+        if (!wallet_user) {
+            res.status(400).send("Please login first");
+            return;
+        }
+        // verify parameters
+        if (typeof req.body.enrollId === "undefined" || typeof req.body.enrollSecret === "undefined") {
+            res.status(400).send("Please use correct parameters");
+            return;
+        }
+        // verify identity validity (either unused, or linked to this user)
+        this.wallet.getRegisteredIdentities()
+            .then(result => {
+            console.log(result);
+            let existing = false;
+            // verify if identity isn't already registered
+            for (let i = 0; i < result.length; i++) {
+                if (result[i].identity == req.body.enrollId && result[i].username != wallet_user) {
+                    console.log("Identity %s already registered to other user", req.body.enrollId);
+                    res.status(400).send("Incorrect identity");
+                    return;
+                }
+                else if (result[i].identity == req.body.enrollId && result[i].username == wallet_user) {
+                    // using existing identity
+                    console.log("existing identity");
+                    existing = true;
+                }
+            }
+            // enroll user
             this.chain.enroll(req.body.enrollId, req.body.enrollSecret, (err, user) => {
                 if (err) {
                     console.log("ERROR: failed to enroll user: %s", err);
@@ -27,8 +57,17 @@ class EnrollRoutes extends base_chain_route_1.BaseChainRoute {
                 }
                 else {
                     console.log("Successfully enrolled user: %s", user.getName());
-                    // Add username to session
-                    req.session['enrolledID'] = user.getName();
+                    // add identity to user if necessary
+                    if (!existing) {
+                        this.wallet.addIdentity(wallet_user, user.getName())
+                            .then(() => {
+                            // Add username to session
+                            req.session['enrolledID'] = user.getName();
+                        })
+                            .catch(err => {
+                            console.log("Failded to save identity: %s", err.text());
+                        });
+                    }
                     // add certificate if not set
                     this.store.getValue(user.getName() + '_certs', (err, cert_str) => {
                         if (err) {
@@ -67,10 +106,10 @@ class EnrollRoutes extends base_chain_route_1.BaseChainRoute {
                     });
                 }
             });
-        }
-        else {
-            res.status(400).send("Please use correct parameters");
-        }
+        })
+            .catch(err => {
+            console.log("Error: ", err.text());
+        });
     }
     unenroll(req, res) {
         if (typeof req.session['enrolledID'] !== 'undefined') {

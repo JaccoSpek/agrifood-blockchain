@@ -3,7 +3,6 @@ import {Headers, Http, RequestOptions} from '@angular/http';
 import {Accreditation, Authorization, CcRole, GrapeAsset} from '../types';
 import 'rxjs/add/operator/toPromise';
 import { API_URL } from '../config';
-import {stringifyElement} from "@angular/platform-browser/testing/src/browser_util";
 
 @Injectable()
 export class ChainService {

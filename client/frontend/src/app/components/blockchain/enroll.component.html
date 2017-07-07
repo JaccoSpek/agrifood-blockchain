@@ -1,5 +1,5 @@
 <div *ngIf="enrolledId">
-  <h3>Welcome {{enrolledId}}</h3>
+  <h4>Enrolled ID: {{enrolledId}}</h4>
 
   <button type="button" class="btn btn-default" (click)="unenroll()">Unenroll</button>
 </div>
@@ -7,7 +7,7 @@
   <div class="alert" [ngClass]="msg.level" *ngIf="msg">
     <strong>{{msg.text}}</strong>
   </div>
-  <h3>Enroll</h3>
+  <h4>Enroll</h4>
   <div id="enroll">
     <div class="form-group">
       <label for="enrollId">Username</label>

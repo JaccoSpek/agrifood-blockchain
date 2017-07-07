@@ -13,6 +13,7 @@ export class Wallet {
         };
     }
 
+    // add user to DB
     public addUser(username:string, password:string, role:string):Promise<boolean> {
         return new Promise((resolve,reject) => {
             try {
@@ -36,7 +37,7 @@ export class Wallet {
         });
     }
 
-    // verify user
+    // verify username/password
     public verifyUser(username:string, password:string):Promise<boolean>{
         return new Promise((resolve, reject) =>{
             try {
@@ -79,6 +80,7 @@ export class Wallet {
                 client.query('SELECT id,role FROM users WHERE username=:username',{
                     username: username
                 },(err:Error,result:any[])=>{
+                    client.end();
                     if(err){
                         throw err;
                     } else {
@@ -95,10 +97,43 @@ export class Wallet {
         });
     }
 
+    // add identity to user
     public addIdentity(username:string, identity:string):Promise<boolean>{
         return new Promise((resolve, reject) => {
             try {
                 let client = new Mariadb(this.dbConfig);
+
+                client.query('INSERT INTO identities (user_id, identity) VALUES((SELECT id FROM users WHERE username=:username), :identity)',{
+                    username:username,
+                    identity:identity
+                }, (err:Error) => {
+                    client.end();
+                    if(err){
+                        throw err
+                    } else {
+                        resolve(true);
+                    }
+                });
+
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    // get registered identities
+    public getRegisteredIdentities():Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            try {
+                let client = new Mariadb(this.dbConfig);
+
+                client.query('SELECT users.username, identities.identity FROM identities,users WHERE users.id = identities.user_id',null,{useArray:false},(err:Error,result:any[]) => {
+                    if(err){
+                        throw err;
+                    } else {
+                        resolve(result);
+                    }
+                })
             } catch (err) {
                 reject(err);
             }

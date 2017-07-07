@@ -17,7 +17,7 @@ export class AuthRoutes {
             this.login(req,res);
         });
 
-        this.router.post('/auth/logout',(req: Request, res: Response) => {
+        this.router.get('/auth/logout',(req: Request, res: Response) => {
             this.logout(req,res);
         });
 
@@ -27,7 +27,7 @@ export class AuthRoutes {
     }
 
     private login(req:Request, res:Response):void {
-        if(this.authStatus(req)){ // loggedIn
+        if(AuthRoutes.authStatus(req)){ // loggedIn
             console.log("Already logged in");
             res.status(400).send("please logout first");
         } else { // not logged in
@@ -37,14 +37,14 @@ export class AuthRoutes {
             } else { // correct parameters
                 this.wallet.verifyUser(req.body['username'],req.body['password'])
                     .then(result => {
-                       // verify result and login
+                        // verify result and login
                         if(result){
                             console.log("Successfully logged in");
                             req.session['userID'] = req.body["username"];
                             res.send("Successfully logged in "+req.body['username']);
                         } else {
                             console.log("Failed to login");
-                            res.status(400).send("Unable to login, invalid details")
+                            res.status(400).send("invalid details")
                         }
                     })
                     .catch(err => {
@@ -56,7 +56,7 @@ export class AuthRoutes {
     }
 
     private logout(req:Request, res:Response):void {
-        if(this.authStatus(req)){ // logged in
+        if(AuthRoutes.authStatus(req)){ // logged in
             req.session['userID'] = null;
             res.send(true);
         } else { // not logged in
@@ -65,7 +65,7 @@ export class AuthRoutes {
     }
 
     private getAuthStatus(req:Request, res:Response):void {
-        let userName:string = this.authStatus(req);
+        let userName:string = AuthRoutes.authStatus(req);
         if(userName){
             res.send(userName);
         } else {
@@ -73,7 +73,7 @@ export class AuthRoutes {
         }
     }
 
-    private authStatus(req:Request):string {
+    public static authStatus(req:Request):string {
         if(typeof req.session['userID'] === 'undefined' || req.session['userID'] === null){ // not logged in
             return null;
         } else {

@@ -6,10 +6,13 @@ import { FormsModule }      from '@angular/forms';
 import { AppComponent }     from './app.component';
 import { SharedService }    from './services/shared.service';
 import { ChainService }     from './services/chain.service';
+import { WalletService }    from './services/wallet.service';
 import { AppRoutingModule } from './modules/app-routing.module';
 
-import { EnrollComponent } from './components/chaincode/enroll.component';
-import { ChaincodeIdComponent } from './components/chaincode/chaincode-id.component';
+import { AuthComponent } from './components/auth/auth.component';
+import { BlockchainComponent } from './components/blockchain/bockchain.component';
+import { EnrollComponent } from './components/blockchain/enroll.component';
+import { ChaincodeIdComponent } from './components/blockchain/chaincode-id.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { AddPartyComponent } from "./components/admin/add-party.component";
 import { AccreditationbodyComponent } from "./components/accreditationbody/accreditationbody.component";
@@ -44,6 +47,8 @@ import {AuditorAuthorizationsComponent} from "./components/auditor/auditor-autho
   imports:      [ BrowserModule, HttpModule, FormsModule, AppRoutingModule ],
   declarations: [
     AppComponent,
+    AuthComponent,
+    BlockchainComponent,
     EnrollComponent,
     ChaincodeIdComponent,
     AdminComponent,
@@ -76,7 +81,7 @@ import {AuditorAuthorizationsComponent} from "./components/auditor/auditor-autho
     GrantedAuthorizationsComponent,
     GrapeAssetsComponent
   ],
-  providers:    [ SharedService, ChainService ],
+  providers:    [ SharedService, ChainService, WalletService ],
   bootstrap:    [ AppComponent ]
 })
 export class AppModule { }

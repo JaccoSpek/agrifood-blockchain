@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const hfc = require("hfc");
+const wallet_1 = require("../wallet/wallet");
 class BaseChainRoute {
     constructor(router, chain) {
         this.router = router;
         this.chain = chain;
+        this.wallet = new wallet_1.Wallet();
         this.store = this.chain.getKeyValStore();
     }
     verifyUser(req, cb) {

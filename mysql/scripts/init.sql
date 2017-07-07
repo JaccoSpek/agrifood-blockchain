@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(10) NOT NULL
 );
 CREATE TABLE IF NOT EXISTS identities (
-    userId INT NOT NULL,
+    user_id INT NOT NULL,
     identity VARCHAR(255) NOT NULL UNIQUE,
-    PRIMARY KEY(userId, identity),
-    FOREIGN KEY (userId) REFERENCES users(id)
+    PRIMARY KEY(user_id, identity),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );

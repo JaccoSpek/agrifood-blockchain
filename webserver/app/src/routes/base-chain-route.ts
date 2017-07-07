@@ -1,15 +1,18 @@
 import * as hfc from 'hfc';
 import { Router, Request } from "express";
 import {Chain, KeyValStore, Member, TCert, TransactionContext} from "hfc/lib/hfc";
+import {Wallet} from "../wallet/wallet";
 
 export abstract class BaseChainRoute {
     protected router:Router;
     protected chain:Chain;
     protected store:KeyValStore;
+    protected wallet:Wallet;
 
     constructor(router:Router, chain:Chain){
         this.router = router;
         this.chain = chain;
+        this.wallet = new Wallet();
 
         this.store = this.chain.getKeyValStore();
     }
