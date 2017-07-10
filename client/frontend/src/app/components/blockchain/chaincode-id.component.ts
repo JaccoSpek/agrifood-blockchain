@@ -26,6 +26,7 @@ export class ChaincodeIdComponent implements OnInit {
         if(result != "false") {
           this.ccId = result;
           this.sharedService.setKey("chaincodeID",result);
+          this.sharedService.notifyOther({option: 'ccid',value: result});
         }
       });
     }
@@ -40,9 +41,9 @@ export class ChaincodeIdComponent implements OnInit {
 
   update():void {
     if(this.newCcId != null){
-      this.sharedService.setKey("chaincodeID",this.newCcId);
       this.chainService.set_ccid(this.newCcId).then((result:string) => {
-        console.log(result);
+        this.sharedService.notifyOther({option: 'ccid',value: result});
+        this.sharedService.setKey("chaincodeID",this.newCcId);
       });
     }
   }
@@ -53,6 +54,7 @@ export class ChaincodeIdComponent implements OnInit {
     this.chainService.deploy().then((result:string)=>{
       console.log("Successfully deployed contract: %s",result);
       this.sharedService.setKey("chaincodeID",result);
+      this.sharedService.notifyOther({option: 'ccid',value: result})
       this.ccId = result;
       this.msg = null;
     }).catch(() => {

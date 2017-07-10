@@ -1,10 +1,10 @@
 import { Component, OnInit }    from '@angular/core';
-import { Observable }         from 'rxjs/Rx';
 
 import { Message,CcRole } from '../../types';
 
 import { SharedService } from '../../services/shared.service';
 import { ChainService }   from '../../services/chain.service';
+import {Subscription} from "rxjs/Subscription";
 
 @Component({
   moduleId: module.id,
@@ -13,20 +13,12 @@ import { ChainService }   from '../../services/chain.service';
 })
 export class EnrollComponent implements OnInit {
   private enrolledId:string;
+  private ccid:string;
   private msg:Message;
   private role:CcRole;
+  private subscription:Subscription;
 
   constructor(private sharedService:SharedService, private chainService:ChainService) {};
-
-  getRole():void {
-    let ccID:string = this.sharedService.getValue("chaincodeID");
-    if(this.enrolledId && ccID){
-      this.chainService.get_caller_role().then(result => {
-        this.role = result as CcRole;
-        this.sharedService.setKey("role",JSON.stringify(this.role));
-      });
-    }
-  }
 
   ngOnInit(): void {
     this.chainService.get_enrollment().then(result => {
@@ -40,8 +32,26 @@ export class EnrollComponent implements OnInit {
       }
     });
 
-    let timer = Observable.timer(0,1000);
-    timer.subscribe(t => this.getRole());
+    this.subscription = this.sharedService.notifyObservable$.subscribe(result => {
+      if(result.hasOwnProperty('option') && result.option === 'enroll'){
+        this.enrolledId = result.value;
+        this.getRole();
+      }
+      if(result.hasOwnProperty('option') && result.option === 'ccid'){
+        this.ccid = result.value;
+        this.getRole();
+      }
+    });
+  }
+
+  getRole():void {
+    if(this.enrolledId && this.ccid){
+      this.chainService.get_caller_role().then(result => {
+        this.role = result as CcRole;
+        this.sharedService.setKey("role",JSON.stringify(this.role));
+        this.sharedService.notifyOther({option: 'role', value: JSON.stringify(this.role) });
+      });
+    }
   }
 
   private enroll(enrollId: string, enrollSecret: string): void {

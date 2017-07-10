@@ -27,11 +27,20 @@ export class AddPartyComponent extends AppComponent implements OnInit{
     }
   }
 
+  private getRole():void {
+    this.chainService.get_caller_role().then(result => {
+      let role:CcRole = result as CcRole;
+      this.sharedServ.setKey("role",JSON.stringify(this.role));
+      this.sharedServ.notifyOther({option: 'role', value: JSON.stringify(role) });
+    });
+  }
+
   private addUserRole(user:string, role:string):void {
     console.log("add user %s (%s)",user,role);
     this.msg = {text:"Adding user..",level:"alert-info"} as Message;
     this.chainService.add_party(user,role).then(result => {
       this.msg = {text:result,level:"alert-success"} as Message;
+      this.getRole();
     }).catch(reason => {
       this.msg = {text:reason,level:"alert-danger"} as Message;
     });
