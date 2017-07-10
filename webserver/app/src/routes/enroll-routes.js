@@ -34,7 +34,6 @@ class EnrollRoutes extends base_chain_route_1.BaseChainRoute {
         // verify identity validity (either unused, or linked to this user)
         this.wallet.getRegisteredIdentities()
             .then(result => {
-            console.log(result);
             let existing = false;
             // verify if identity isn't already registered
             for (let i = 0; i < result.length; i++) {
@@ -61,13 +60,14 @@ class EnrollRoutes extends base_chain_route_1.BaseChainRoute {
                     if (!existing) {
                         this.wallet.addIdentity(wallet_user, user.getName())
                             .then(() => {
-                            // Add username to session
-                            req.session['enrolledID'] = user.getName();
+                            console.log("Successfully added identity to %s", wallet_user);
                         })
                             .catch(err => {
                             console.log("Failded to save identity: %s", err.text());
                         });
                     }
+                    // Add username to session
+                    req.session['enrolledID'] = user.getName();
                     // add certificate if not set
                     this.store.getValue(user.getName() + '_certs', (err, cert_str) => {
                         if (err) {

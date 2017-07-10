@@ -1,27 +1,27 @@
-import {Component, OnInit}    from '@angular/core';
-import {WalletService}        from "../../services/wallet.service";
-import { Observable }         from 'rxjs/Rx';
+import {Component, OnDestroy, OnInit}    from '@angular/core';
+import {SharedService} from "../../services/shared.service";
+import {Subscription} from "rxjs/Subscription";
+
 @Component({
   moduleId: module.id,
   selector: 'blockchain',
   templateUrl: 'blockchain.component.html'
 })
-export class BlockchainComponent implements OnInit{
+export class BlockchainComponent implements OnInit, OnDestroy{
   private userID:string;
+  private subscription:Subscription;
 
-  constructor(private walletService:WalletService) {};
+  constructor(private sharedService:SharedService) {};
 
   ngOnInit():void {
-    let timer = Observable.timer(0,1000);
-    timer.subscribe(() => {
-      this.walletService.getStatus()
-        .then(result => {
-          this.userID = result;
-        })
-        .catch(() => {
-          this.userID = null;
-        });
+    this.subscription = this.sharedService.notifyObservable$.subscribe((result) => {
+      if(result.hasOwnProperty('option') && result.option === 'login'){
+        this.userID = result.value;
+      }
     });
   }
 
+  ngOnDestroy():void {
+    this.subscription.unsubscribe();
+  }
 }

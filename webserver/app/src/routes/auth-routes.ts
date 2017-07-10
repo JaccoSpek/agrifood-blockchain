@@ -25,8 +25,8 @@ export class AuthRoutes {
            this.getAuthStatus(req,res);
         });
 
-        this.router.get('/wallet/roles', (req:Request, res:Response) => {
-            this.getMyRoles(req,res);
+        this.router.get('/wallet/identities', (req:Request, res:Response) => {
+            this.getMyIdentities(req,res);
         });
     }
 
@@ -62,6 +62,7 @@ export class AuthRoutes {
     private logout(req:Request, res:Response):void {
         if(AuthRoutes.authStatus(req)){ // logged in
             req.session['userID'] = null;
+            req.session['enrolledID'] = null;
             res.send(true);
         } else { // not logged in
             res.status(400).send("not logged in");
@@ -77,7 +78,7 @@ export class AuthRoutes {
         }
     }
 
-    private getMyRoles(req:Request, res:Response):void {
+    private getMyIdentities(req:Request, res:Response):void {
         let user:string = AuthRoutes.authStatus(req);
         if(user){ // logged in
             this.wallet.getUserIdentities(user)

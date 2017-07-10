@@ -1,10 +1,10 @@
 import { Component, OnInit }    from '@angular/core';
-import { Observable }         from 'rxjs/Rx';
 
 import { Message } from '../../types';
 
 import { SharedService }   from '../../services/shared.service';
 import { ChainService }   from '../../services/chain.service';
+import {Subscription} from "rxjs/Subscription";
 
 @Component({
   moduleId: module.id,
@@ -16,24 +16,26 @@ export class ChaincodeIdComponent implements OnInit {
   private ccId:string;
   private newCcId:string = "";
   private msg:Message;
+  private subscription:Subscription;
 
   constructor(private sharedService:SharedService, private chainService:ChainService) {};
 
-  getData():void {
-    this.enrolledId = this.sharedService.getValue("enrolledId");
-    this.ccId = this.sharedService.getValue("chaincodeID");
+  ngOnInit(): void {
     if(!this.ccId) {
       this.chainService.get_ccid().then(result => {
         if(result != "false") {
+          this.ccId = result;
           this.sharedService.setKey("chaincodeID",result);
         }
       });
     }
-  }
 
-  ngOnInit(): void {
-    let timer = Observable.timer(0,1000);
-    timer.subscribe(t => this.getData());
+    this.subscription = this.sharedService.notifyObservable$.subscribe((result) => {
+      if(result.hasOwnProperty('option') && result.option === 'enroll'){
+        this.enrolledId = result.value;
+      }
+    });
+
   }
 
   update():void {

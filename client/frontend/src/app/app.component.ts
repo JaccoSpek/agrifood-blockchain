@@ -23,7 +23,9 @@ export class AppComponent implements OnInit {
         this.role = role;
       }
     }
+
     this.enrolledId = this.sharedService.getValue("enrolledId");
+
     if(!this.ready && this.role !== null && this.enrolledId !== null) {
       this.ready = true;
       this.OnInitialized();

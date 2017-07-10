@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject }    from 'rxjs/Subject';
 
 export class KeyValue {
   key:string;
@@ -9,6 +10,16 @@ export class KeyValue {
 @Injectable()
 export class SharedService {
   private keyValueStore: KeyValue[] = [];
+
+  private notify = new Subject<any>();
+
+  notifyObservable$ = this.notify.asObservable();
+
+  public notifyOther(data:any){
+    if(data){
+      this.notify.next(data);
+    }
+  }
 
   public setKey(key:string, value:any, readonly?:boolean): boolean {
     let found:boolean = false;

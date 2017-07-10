@@ -19,11 +19,11 @@ export class AuthComponent implements OnInit{
       .then(result => {
         console.log(result);
         this.userID = result;
-        this.sharedService.setKey("userID",result);
+        this.sharedService.notifyOther({option: 'login',value: result});
       })
       .catch(err =>{
         console.log(err.text())
-      })
+      });
   }
 
   login(username:string, password:string):void {
@@ -39,7 +39,7 @@ export class AuthComponent implements OnInit{
           console.log(result);
 
           this.userID = username;
-          this.sharedService.setKey("userID",result);
+          this.sharedService.notifyOther({option: 'login',value: username});
         })
         .catch(err => {
           this.msg = { text: "Unable to login: "+err.text(), level:"alert-danger" };
@@ -56,7 +56,11 @@ export class AuthComponent implements OnInit{
     this.walletService.logout()
       .then(() => {
         this.userID = null;
-        this.sharedService.setKey("userID",null);
+        this.sharedService.notifyOther({option: 'login',value: null});
+        this.sharedService.setKey("enrolledId",null);
+        this.sharedService.setKey("role",null);
+        this.sharedService.notifyOther({option: 'enroll',value: null});
+        this.sharedService.notifyOther({option: 'role',value: null});
       })
       .catch(err => {
         this.msg = { text: "Unable to logout: "+err.text(), level:"alert-danger" };

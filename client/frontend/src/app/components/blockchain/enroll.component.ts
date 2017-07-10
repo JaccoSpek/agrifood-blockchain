@@ -34,6 +34,7 @@ export class EnrollComponent implements OnInit {
         console.log("Enrolled in as:",result);
         this.enrolledId = result;
         this.sharedService.setKey("enrolledId",result);
+        this.sharedService.notifyOther({option: 'enroll',value: result});
       } else {
         console.log("Currently not enrolled.");
       }
@@ -55,6 +56,7 @@ export class EnrollComponent implements OnInit {
         console.log("Enrollment result:",result);
         this.enrolledId = result;
         this.sharedService.setKey("enrolledId",result);
+        this.sharedService.notifyOther({option: 'enroll',value: result});
       }).catch(() => {
         this.msg = { text: "Failed to enroll", level:"alert-danger"};
       });
@@ -71,6 +73,8 @@ export class EnrollComponent implements OnInit {
       this.enrolledId = null;
       this.sharedService.setKey("enrolledId",null);
       this.sharedService.setKey("role",null);
+      this.sharedService.notifyOther({option: 'enroll',value: null});
+      this.sharedService.notifyOther({option: 'role',value: null});
     }).catch(() => {
       this.msg = { text: "Failed to unenroll", level:"alert-danger"};
     });

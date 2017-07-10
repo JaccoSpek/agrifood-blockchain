@@ -45,7 +45,7 @@ export abstract class BaseChainRoute {
                 }
             });
         } else {
-            cb(new Error("Please enroll first!"))
+            cb(new Error(req.session['enrolledID']+"Please enroll first!"))
         }
     }
 
