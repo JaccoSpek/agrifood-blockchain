@@ -15,6 +15,7 @@ import {WalletService} from "../../services/wallet.service";
 export class ChaincodeIdComponent implements OnInit {
   private enrolledId:string;
   private ccId:string;
+  private knownAddresses:string[];
   private newCcId:string = "";
   private msg:Message;
   private subscription:Subscription;
@@ -38,14 +39,14 @@ export class ChaincodeIdComponent implements OnInit {
       }
     });
 
+    this.updateAddresses();
+  }
+
+  private updateAddresses():void {
     this.walletService.getAddresses()
       .then(result => {
-        console.log("ADDRESSES",result);
-      })
-      .catch(err => {
-        console.log("ERROR:",err.toString())
+        this.knownAddresses = result as string[];
       });
-
   }
 
   update():void {
@@ -54,6 +55,8 @@ export class ChaincodeIdComponent implements OnInit {
         this.sharedService.notifyOther({option: 'ccid',value: this.newCcId});
         this.sharedService.setKey("chaincodeID",this.newCcId);
         this.ccId = this.newCcId;
+
+        this.updateAddresses();
       });
     }
   }
@@ -67,6 +70,8 @@ export class ChaincodeIdComponent implements OnInit {
       this.sharedService.notifyOther({option: 'ccid',value: result})
       this.ccId = result;
       this.msg = null;
+
+      this.updateAddresses();
     }).catch(() => {
       console.log("Failed to deploy");
       this.msg = { level: "alert-danger", text: "Failed to deploy"};

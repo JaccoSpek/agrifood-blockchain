@@ -6,6 +6,12 @@
   <label for="ccId">ID</label>
   <input type="text" class="form-control" id="ccId" [(ngModel)]="newCcId">
 </div>
+<div class="form-group" *ngIf="knownAddresses && knownAddresses.length > 0">
+  <label for="knownId">Known addresses:</label>
+  <select id="knownId" class="form-control" [(ngModel)]="newCcId">
+    <option *ngFor="let address of knownAddresses" [value]="address">{{address}}</option>
+  </select>
+</div>
 <p *ngIf="ccId"><strong>Current:</strong> {{ccId}}</p>
 <button type="button" class="btn btn-default" (click)="update()">Update</button>
-<button *ngIf="enrolledId" type="button" class="btn btn-success" (click)="deploy()">Deploy</button>
+<button *ngIf="enrolledId" type="button" class="btn btn-success" (click)="deploy()">Deploy new</button>
