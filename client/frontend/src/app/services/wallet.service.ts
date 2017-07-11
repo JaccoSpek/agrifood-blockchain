@@ -54,6 +54,15 @@ export class WalletService {
       .catch(WalletService.handleError);
   }
 
+  getAddresses():Promise<string[]> {
+    let url:string = `${this.apiURL}/wallet/addresses`;
+
+    return this.http.get(url, this.opts)
+      .toPromise()
+      .then(response => response.json() as string[])
+      .catch(WalletService.handleError);
+  }
+
   private static handleError(error: any): Promise<any> {
     console.error('An error occurred', error);
     return Promise.reject(error.message || error);

@@ -140,6 +140,7 @@ export class Wallet {
         });
     }
 
+    // get identities registered to user
     public getUserIdentities(username:string):Promise<any[]> {
         return new Promise((resolve, reject) => {
             try {
@@ -159,4 +160,60 @@ export class Wallet {
             }
         })
     }
+
+    // add address to user
+    public addAddress(username:string, address:string):Promise<boolean>{
+        return new Promise((resolve, reject) => {
+            try {
+                this.getUserAddresses(username)
+                    .then(addresses => {
+                        if(addresses.indexOf(address) < 0) {
+                            let client = new Mariadb(this.dbConfig);
+                            client.query('INSERT INTO addresses (user_id, address) VALUES((SELECT id FROM users WHERE username=:username), :address)',{
+                                username:username,
+                                address:address
+                            }, (err:Error) => {
+                                client.end();
+                                if(err){
+                                    throw err
+                                } else {
+                                    resolve(true);
+                                }
+                            });
+                        } else {
+                            console.log("Address exists");
+                            resolve(false);
+                        }
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
+
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    // get identities registered to user
+    public getUserAddresses(username:string):Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            try {
+                let client = new Mariadb(this.dbConfig);
+
+                client.query('SELECT addresses.address FROM addresses,users WHERE users.id = addresses.user_id AND users.username=:username',{
+                    username:username
+                },(err:Error,result:any[]) => {
+                    if(err){
+                        throw err;
+                    } else {
+                        resolve(result);
+                    }
+                })
+            } catch (err) {
+                reject(err);
+            }
+        })
+    }
+
 }

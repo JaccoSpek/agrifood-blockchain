@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_chain_route_1 = require("./base-chain-route");
+const auth_routes_1 = require("./auth-routes");
 class ChaincodeRoutes extends base_chain_route_1.BaseChainRoute {
     create() {
         //log
@@ -13,6 +14,9 @@ class ChaincodeRoutes extends base_chain_route_1.BaseChainRoute {
         });
         this.router.post('/ccid', (req, res) => {
             this.setChaincodeID(req, res);
+        });
+        this.router.get('/wallet/addresses', (req, res) => {
+            this.getAddresses(req, res);
         });
     }
     deploy(req, res) {
@@ -36,6 +40,10 @@ class ChaincodeRoutes extends base_chain_route_1.BaseChainRoute {
                             }
                             else {
                                 req.session['chaincodeID'] = ccID;
+                                let wallet_user = auth_routes_1.AuthRoutes.authStatus(req);
+                                if (wallet_user) {
+                                    this.wallet.addAddress(wallet_user, ccID);
+                                }
                                 res.send(ccID);
                             }
                         });
@@ -61,7 +69,31 @@ class ChaincodeRoutes extends base_chain_route_1.BaseChainRoute {
         else {
             req.session['chaincodeID'] = req.body['chaincodeID'];
             console.log("chaincodeID set to %s", req.body['chaincodeID']);
+            let wallet_user = auth_routes_1.AuthRoutes.authStatus(req);
+            if (wallet_user) {
+                this.wallet.addAddress(wallet_user, req.body['chaincodeID']);
+            }
             res.send("chaincodeID set");
+        }
+    }
+    // resturn my registerred addresses
+    getAddresses(req, res) {
+        let wallet_user = auth_routes_1.AuthRoutes.authStatus(req);
+        if (wallet_user) {
+            this.wallet.getUserAddresses(wallet_user)
+                .then(result => {
+                let addresses = [];
+                for (let i = 0; i < result.length; i++) {
+                    addresses.push(result[i].address);
+                }
+                res.send(addresses);
+            })
+                .catch(err => {
+                res.status(400).send(err.text());
+            });
+        }
+        else {
+            res.status(400).send("Please login first");
         }
     }
 }

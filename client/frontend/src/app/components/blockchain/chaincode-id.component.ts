@@ -5,6 +5,7 @@ import { Message } from '../../types';
 import { SharedService }   from '../../services/shared.service';
 import { ChainService }   from '../../services/chain.service';
 import {Subscription} from "rxjs/Subscription";
+import {WalletService} from "../../services/wallet.service";
 
 @Component({
   moduleId: module.id,
@@ -18,7 +19,7 @@ export class ChaincodeIdComponent implements OnInit {
   private msg:Message;
   private subscription:Subscription;
 
-  constructor(private sharedService:SharedService, private chainService:ChainService) {};
+  constructor(private sharedService:SharedService, private chainService:ChainService, private walletService:WalletService) {};
 
   ngOnInit(): void {
     if(!this.ccId) {
@@ -36,6 +37,14 @@ export class ChaincodeIdComponent implements OnInit {
         this.enrolledId = result.value;
       }
     });
+
+    this.walletService.getAddresses()
+      .then(result => {
+        console.log("ADDRESSES",result);
+      })
+      .catch(err => {
+        console.log("ERROR:",err.toString())
+      });
 
   }
 
