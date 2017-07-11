@@ -2,7 +2,7 @@
   <div class="col-md-12">
     <h3>Accreditation Body panel</h3>
     <div class="alert alert-warning" *ngIf="!(role && role.Role == 'AccreditationBody')">
-      <strong>You need to be an accreditationbody to view this page</strong>
+      <strong>You need to be an accreditationbody to view this page ({{role.Role}})</strong>
     </div>
 
     <ul class="nav nav-tabs" *ngIf="role && role.Role == 'AccreditationBody'">

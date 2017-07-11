@@ -40,7 +40,7 @@ export class AddPartyComponent extends AppComponent implements OnInit{
     this.msg = {text:"Adding user..",level:"alert-info"} as Message;
     this.chainService.add_party(user,role).then(result => {
       this.msg = {text:result,level:"alert-success"} as Message;
-      this.getRole();
+      //this.getRole();
     }).catch(reason => {
       this.msg = {text:reason,level:"alert-danger"} as Message;
     });
