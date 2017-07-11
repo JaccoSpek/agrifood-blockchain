@@ -3,7 +3,6 @@ import {Headers, Http, RequestOptions} from '@angular/http';
 import {Accreditation, Authorization, CcRole, GrapeAsset} from '../types';
 import 'rxjs/add/operator/toPromise';
 import { API_URL } from '../config';
-import {stringifyElement} from "@angular/platform-browser/testing/src/browser_util";
 
 @Injectable()
 export class ChainService {
@@ -13,7 +12,7 @@ export class ChainService {
 
   constructor(private http: Http) {}
 
-  login(enrollId: string, enrollSecret: string): Promise<boolean> {
+  enroll(enrollId: string, enrollSecret: string): Promise<boolean> {
     let url = `${this.apiURL}/enroll`;
 
     let params = {
@@ -29,7 +28,7 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
-  logout(): Promise<boolean> {
+  unenroll(): Promise<boolean> {
     let url = `${this.apiURL}/unenroll`;
 
     return this.http.post(url,{},this.opts)

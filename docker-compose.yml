@@ -1,5 +1,19 @@
 version: '2'
 services:
+  # mariaDB server
+  mariadb:
+    image: mariadb
+    restart: always
+    volumes:
+      - ./mysql/database:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_DATABASE=wallet
+    ports:
+      - "3306:3306"
+
   # webserver to interact with blockchain
   blockchain-sever:
     container_name: webserver
@@ -15,13 +29,23 @@ services:
       - FRONTEND_ORIGIN=http://bctb1.sensorlab.tno.nl:3000
       - DEPLOY_WAITTIME=30
       - INVOKE_WAITTIME=10
+      - DATABASE_HOST=mariadb
+      - DATABASE_USER=admin
+      - DATABASE_PASSWORD=admin
+      - DATABASE_NAME=wallet
+      - INIT_SQL_FILE=/mysql/scripts/init.sql
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=admin123
     volumes:
       # Chaincode volume
       - ./chaincode:/go/src/tno.nl/chaincode
       # Webserver volumes
       - ./webserver/app:/usr/app
       # - ./webserver/tmp/keyValStore:/tmp/keyValStore
+      # DB query volumes
+      - ./mysql/scripts:/mysql/scripts
     links:
+      - mariadb
       - membersrvc
       - vp0
     command: sh -c "sleep 10; npm install --loglevel error && npm run grunt serve"

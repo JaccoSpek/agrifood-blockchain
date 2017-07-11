@@ -1,32 +1,33 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var hfc = require("hfc");
-var BaseChainRoute = (function () {
-    function BaseChainRoute(router, chain) {
+const hfc = require("hfc");
+const wallet_1 = require("../wallet/wallet");
+class BaseChainRoute {
+    constructor(router, chain) {
         this.router = router;
         this.chain = chain;
+        this.wallet = new wallet_1.Wallet();
         this.store = this.chain.getKeyValStore();
     }
-    BaseChainRoute.prototype.verifyUser = function (req, cb) {
-        var _this = this;
-        // check if user is logged in
+    verifyUser(req, cb) {
+        // check if user is enrolled in
         if (typeof req.session['enrolledID'] !== 'undefined' && req.session['enrolledID'] !== null) {
             // get user object from chain
-            this.chain.getMember(req.session['enrolledID'], function (err, user) {
+            this.chain.getMember(req.session['enrolledID'], (err, user) => {
                 if (err) {
                     cb(new Error("Failed to retrieve user"));
                 }
                 else {
                     // get user tcerts from chain storage
-                    _this.store.getValue(req.session['enrolledID'] + "_certs", function (err, certsStr) {
+                    this.store.getValue(req.session['enrolledID'] + "_certs", (err, certsStr) => {
                         if (err) {
                             cb(new Error("Failed to access keyVal store"));
                         }
                         else {
-                            var certs = JSON.parse(certsStr);
-                            var tcerts = [];
-                            for (var i = 0; i < certs.length; i++) {
-                                tcerts.push(_this.getTCert(certs[i]));
+                            let certs = JSON.parse(certsStr);
+                            let tcerts = [];
+                            for (let i = 0; i < certs.length; i++) {
+                                tcerts.push(this.getTCert(certs[i]));
                             }
                             cb(null, user, tcerts);
                         }
@@ -35,19 +36,18 @@ var BaseChainRoute = (function () {
             });
         }
         else {
-            cb(new Error("Please login first"));
+            cb(new Error(req.session['enrolledID'] + "Please enroll first!"));
         }
-    };
-    BaseChainRoute.prototype.verifyRequest = function (req, requiredParams, cb) {
-        this.verifyUser(req, function (err, user, tcerts) {
+    }
+    verifyRequest(req, requiredParams, cb) {
+        this.verifyUser(req, (err, user, tcerts) => {
             if (err) {
                 cb(new Error(err.message));
             }
             else {
                 // validate input parameters
-                var validRequest = true;
-                for (var _i = 0, requiredParams_1 = requiredParams; _i < requiredParams_1.length; _i++) {
-                    var param = requiredParams_1[_i];
+                let validRequest = true;
+                for (let param of requiredParams) {
                     if (typeof req.body[param] === 'undefined') {
                         validRequest = false;
                         console.log(param, "not found");
@@ -67,17 +67,16 @@ var BaseChainRoute = (function () {
                 }
             }
         });
-    };
-    BaseChainRoute.prototype.verifyQueryRequest = function (req, requiredParams, cb) {
-        this.verifyUser(req, function (err, user, tcerts) {
+    }
+    verifyQueryRequest(req, requiredParams, cb) {
+        this.verifyUser(req, (err, user, tcerts) => {
             if (err) {
                 cb(new Error(err.message));
             }
             else {
                 // validate input parameters
-                var validRequest = true;
-                for (var _i = 0, requiredParams_2 = requiredParams; _i < requiredParams_2.length; _i++) {
-                    var param = requiredParams_2[_i];
+                let validRequest = true;
+                for (let param of requiredParams) {
                     if (typeof req.params[param] === 'undefined') {
                         console.log("param %s not found", param);
                         validRequest = false;
@@ -97,70 +96,70 @@ var BaseChainRoute = (function () {
                 }
             }
         });
-    };
-    BaseChainRoute.prototype.getTCert = function (tcert_object) {
-        var privateKey = this.chain.cryptoPrimitives.ecdsaKeyFromPrivate(tcert_object['privateKey']['priv'], 'hex');
+    }
+    getTCert(tcert_object) {
+        let privateKey = this.chain.cryptoPrimitives.ecdsaKeyFromPrivate(tcert_object['privateKey']['priv'], 'hex');
         return new hfc.TCert(tcert_object['publicKey'], privateKey);
-    };
-    BaseChainRoute.prototype.deployChaincode = function (ccPath, args, user, tcert, cb) {
+    }
+    deployChaincode(ccPath, args, user, tcert, cb) {
         // construct deploy request
-        var deployRequest = {
+        let deployRequest = {
             fcn: "init",
             args: args,
             userCert: tcert,
             chaincodePath: ccPath,
         };
         console.log("Deploying chaincode..");
-        var tx = user.newTransactionContext();
+        let tx = user.newTransactionContext();
         tx.setAttrs(['role']);
         tx.deploy(deployRequest);
-        tx.on("complete", function (results) {
+        tx.on("complete", (results) => {
             // deploy request completed successfully
             console.log("Deploy completed, chaincodeID: %s", results['chaincodeID']);
             cb(null, results['chaincodeID']);
         });
-        tx.on("error", function (error) {
+        tx.on("error", (error) => {
             console.log("Failed to deploy chaincode: request=%j, error=%k", deployRequest, error);
             cb(new Error("Failed to deploy chaincode.."), null);
         });
-    };
-    BaseChainRoute.prototype.invokeChaincode = function (chaincodeID, fcn, args, user, tcert, cb) {
-        var invokeRequest = {
+    }
+    invokeChaincode(chaincodeID, fcn, args, user, tcert, cb) {
+        let invokeRequest = {
             chaincodeID: chaincodeID,
             fcn: fcn,
             args: args,
             userCert: tcert
         };
         console.log("Invoking function %s on %s", fcn, chaincodeID);
-        var tx = user.newTransactionContext();
+        let tx = user.newTransactionContext();
         tx.setAttrs(['role']);
         tx.invoke(invokeRequest);
-        tx.on('submitted', function (results) {
+        tx.on('submitted', (results) => {
             console.log("Invoke submitted successfully; results=%j", results);
         });
-        tx.on('complete', function (results) {
+        tx.on('complete', (results) => {
             console.log("Invoke completed successfully; results=%j", results);
             cb(null, results);
         });
-        tx.on('error', function (error) {
+        tx.on('error', (error) => {
             console.log("Failed to invoke chaincode: request=%j, error=%k", invokeRequest, error);
             cb(new Error("Failed to invoke chaincode"), null);
         });
-    };
-    BaseChainRoute.prototype.queryChaincode = function (chaincodeID, fcn, args, user, tcert, cb) {
-        var queryRequest = {
+    }
+    queryChaincode(chaincodeID, fcn, args, user, tcert, cb) {
+        let queryRequest = {
             chaincodeID: chaincodeID,
             fcn: fcn,
             args: args,
             userCert: tcert
         };
         //console.log("Querying function %s on %s",fcn,chaincodeID);
-        var tx = user.newTransactionContext();
+        let tx = user.newTransactionContext();
         tx.setAttrs(['role']);
         tx.query(queryRequest);
         // listen for events
         tx.on('complete', function (data) {
-            var result = data.result.toString();
+            let result = data.result.toString();
             //console.log("Query completed successfully; results=%s", result);
             cb(null, result);
         });
@@ -168,7 +167,6 @@ var BaseChainRoute = (function () {
             console.log("Failed to query chaincode: request=%j, error=%k", queryRequest, error);
             cb(error, null);
         });
-    };
-    return BaseChainRoute;
-}());
+    }
+}
 exports.BaseChainRoute = BaseChainRoute;

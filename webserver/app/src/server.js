@@ -1,25 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var bodyParser = require("body-parser");
-var cookieParser = require("cookie-parser");
-var session = require("express-session");
-var express = require("express");
-var cors = require("cors");
-var logger = require("morgan");
-var hfc = require("hfc");
-var errorHandler = require("errorhandler");
-var methodOverride = require("method-override");
-var enroll_routes_1 = require("./routes/enroll-routes");
-var chaincode_routes_1 = require("./routes/chaincode-routes");
-var admin_routes_1 = require("./routes/admin-routes");
-var ab_routes_1 = require("./routes/ab-routes");
-var cb_routes_1 = require("./routes/cb-routes");
-var farm_routes_1 = require("./routes/farm-routes");
-var auditor_routes_1 = require("./routes/auditor-routes");
-var trader_routes_1 = require("./routes/trader-routes");
-var public_routes_1 = require("./routes/public-routes");
-var Server = (function () {
-    function Server() {
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const session = require("express-session");
+const express = require("express");
+const cors = require("cors");
+const logger = require("morgan");
+const hfc = require("hfc");
+const errorHandler = require("errorhandler");
+const methodOverride = require("method-override");
+const enroll_routes_1 = require("./routes/enroll-routes");
+const chaincode_routes_1 = require("./routes/chaincode-routes");
+const admin_routes_1 = require("./routes/admin-routes");
+const ab_routes_1 = require("./routes/ab-routes");
+const cb_routes_1 = require("./routes/cb-routes");
+const farm_routes_1 = require("./routes/farm-routes");
+const auditor_routes_1 = require("./routes/auditor-routes");
+const trader_routes_1 = require("./routes/trader-routes");
+const public_routes_1 = require("./routes/public-routes");
+const user_routes_1 = require("./routes/user-routes");
+const auth_routes_1 = require("./routes/auth-routes");
+class Server {
+    static bootstrap() {
+        return new Server();
+    }
+    constructor() {
         // create expressjs application
         this.app = express();
         // configure application
@@ -29,10 +34,7 @@ var Server = (function () {
         // add api
         this.api();
     }
-    Server.bootstrap = function () {
-        return new Server();
-    };
-    Server.prototype.config = function () {
+    config() {
         // use logger middleware
         this.app.use(logger("dev"));
         this.app.use(cors({
@@ -61,10 +63,10 @@ var Server = (function () {
         });
         // error handling
         this.app.use(errorHandler());
-    };
-    Server.prototype.configChain = function () {
-        var PEER_ADDRESS = process.env.PEER_ADDRESS;
-        var MEMBERSRVC_ADDRESS = process.env.MEMBERSRVC_ADDRESS;
+    }
+    configChain() {
+        let PEER_ADDRESS = process.env.PEER_ADDRESS;
+        let MEMBERSRVC_ADDRESS = process.env.MEMBERSRVC_ADDRESS;
         this.chain = hfc.getChain("chain", true);
         // config chain
         this.chain.setMemberServicesUrl("grpc://" + MEMBERSRVC_ADDRESS);
@@ -73,31 +75,34 @@ var Server = (function () {
         this.chain.setDeployWaitTime(Number(process.env.DEPLOY_WAITTIME || 30));
         this.chain.setInvokeWaitTime(Number(process.env.INVOKE_WAITTIME || 10));
         this.chain.setKeyValStore(hfc.newFileKeyValStore('/tmp/keyValStore'));
-    };
-    Server.prototype.api = function () {
-        var router;
+    }
+    api() {
+        let router;
         router = express.Router();
-        var enrollRoutes = new enroll_routes_1.EnrollRoutes(router, this.chain);
+        let authRoutes = new auth_routes_1.AuthRoutes(router);
+        authRoutes.create();
+        let userRoutes = new user_routes_1.UserRoutes(router);
+        userRoutes.create();
+        let enrollRoutes = new enroll_routes_1.EnrollRoutes(router, this.chain);
         enrollRoutes.create();
-        var ccRoutes = new chaincode_routes_1.ChaincodeRoutes(router, this.chain);
+        let ccRoutes = new chaincode_routes_1.ChaincodeRoutes(router, this.chain);
         ccRoutes.create();
-        var adminRoutes = new admin_routes_1.AdminRoutes(router, this.chain);
+        let adminRoutes = new admin_routes_1.AdminRoutes(router, this.chain);
         adminRoutes.create();
-        var abRoutes = new ab_routes_1.ABRoutes(router, this.chain);
+        let abRoutes = new ab_routes_1.ABRoutes(router, this.chain);
         abRoutes.create();
-        var cbRoutes = new cb_routes_1.CBRoutes(router, this.chain);
+        let cbRoutes = new cb_routes_1.CBRoutes(router, this.chain);
         cbRoutes.create();
-        var farmRoutes = new farm_routes_1.FarmRoutes(router, this.chain);
+        let farmRoutes = new farm_routes_1.FarmRoutes(router, this.chain);
         farmRoutes.create();
-        var auditorRoutes = new auditor_routes_1.AuditorRoutes(router, this.chain);
+        let auditorRoutes = new auditor_routes_1.AuditorRoutes(router, this.chain);
         auditorRoutes.create();
-        var traderRoutes = new trader_routes_1.TraderRoutes(router, this.chain);
+        let traderRoutes = new trader_routes_1.TraderRoutes(router, this.chain);
         traderRoutes.create();
-        var publicRoutes = new public_routes_1.PublicRoutes(router, this.chain);
+        let publicRoutes = new public_routes_1.PublicRoutes(router, this.chain);
         publicRoutes.create();
-        // Router middleware
+        // Router middleware..
         this.app.use(router);
-    };
-    return Server;
-}());
+    }
+}
 exports.Server = Server;

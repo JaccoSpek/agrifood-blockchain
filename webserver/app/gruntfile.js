@@ -8,13 +8,16 @@ module.exports = function(grunt) {
                 dest: "./dist",
                 options: {
                     fast: 'never'
+                },
+                tsconfig: {
+                    tsconfig: "./tsconfig.json"
                 }
             }
         },
         watch: {
             scripts: {
-                files: ["src/\*\*/\*.ts", "!src/.baseDir.ts"],
-                tasks: ["ts:build"],
+                files: ["src/\*\*/\*.ts", "!src/.baseDir.ts" /*, "!src/initdb.ts" */],
+                tasks: ["ts:build","run:initdb"],
                 options: {
                     spawn:false
                 }
@@ -35,16 +38,22 @@ module.exports = function(grunt) {
                     logConcurrentOutput: true
                 }
             }
+        },
+        run: {
+            initdb: {
+                args: [
+                    'dist/initdb.js'
+                ]
+            }
         }
-
     });
 
     grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-nodemon");
     grunt.loadNpmTasks("grunt-concurrent");
+    grunt.loadNpmTasks('grunt-run');
 
-    grunt.registerTask("serve", ["ts:build","concurrent:watchers"]);
-    grunt.registerTask("default", ["ts:build"]);
+    grunt.registerTask("serve", ["ts:build","run:initdb","concurrent:watchers"]);
 
 };

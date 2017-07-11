@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import { Observable }         from 'rxjs/Rx';
 import {CcRole} from "./types";
 import {SharedService} from "./services/shared.service";
 
@@ -9,26 +8,13 @@ import {SharedService} from "./services/shared.service";
   templateUrl: 'app.component.html'
 })
 export class AppComponent implements OnInit {
-  role:CcRole;
-  enrolledId:string;
+  protected role:CcRole;
+  protected enrolledId:string;
+  protected ccid:string;
 
   private ready:boolean;
 
   constructor(private sharedService:SharedService) {};
-
-  getUserData():void {
-    let role:CcRole = JSON.parse(this.sharedService.getValue("role")) as CcRole;
-    if(role !== null){
-      if(!this.role || this.role.Admin != role.Admin || this.role.Role != role.Role) {
-        this.role = role;
-      }
-    }
-    this.enrolledId = this.sharedService.getValue("enrolledId");
-    if(!this.ready && this.role !== null && this.enrolledId !== null) {
-      this.ready = true;
-      this.OnInitialized();
-    }
-  }
 
   protected OnInitialized():void {
   }
@@ -36,7 +22,30 @@ export class AppComponent implements OnInit {
   ngOnInit():void {
     this.ready = false;
 
-    let timer = Observable.timer(0,1000);
-    timer.subscribe(t => this.getUserData());
+    // get values if already set
+    this.enrolledId = this.sharedService.getValue("enrolledId");
+    this.role = JSON.parse(this.sharedService.getValue("role")) as CcRole;
+    this.update();
+
+    // listen for updates
+    this.sharedService.notifyObservable$.subscribe(result => {
+      if(result.hasOwnProperty('option') && result.option === 'enroll'){
+        this.enrolledId = result.value;
+        this.update();
+      }
+      if(result.hasOwnProperty('option') && result.option === 'role'){
+        this.role = JSON.parse(result.value) as CcRole;
+        this.update();
+      }
+    });
+
   }
+
+  private update():void {
+    if(!this.ready && this.role !== null  && typeof this.role !== "undefined" && this.enrolledId !== null && typeof this.enrolledId !== "undefined" ) {
+      this.ready = true;
+      this.OnInitialized();
+    }
+  }
+
 }

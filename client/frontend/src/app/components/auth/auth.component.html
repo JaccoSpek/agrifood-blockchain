@@ -1,0 +1,22 @@
+<div *ngIf="userID">
+  <h4>Welcome {{userID}}</h4>
+
+  <button type="button" class="btn btn-default" (click)="logout()">Logout</button>
+</div>
+<div *ngIf="!userID">
+  <div class="alert" [ngClass]="msg.level" *ngIf="msg">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <h4>Login</h4>
+  <div id="login">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" class="form-control" id="username" [(ngModel)]="username">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" class="form-control" id="password" [(ngModel)]="password">
+    </div>
+    <button type="button" class="btn btn-default" (click)="login(username,password)">Login</button>
+  </div>
+</div>

@@ -1,15 +1,18 @@
 import * as hfc from 'hfc';
 import { Router, Request } from "express";
 import {Chain, KeyValStore, Member, TCert, TransactionContext} from "hfc/lib/hfc";
+import {Wallet} from "../wallet/wallet";
 
 export abstract class BaseChainRoute {
     protected router:Router;
     protected chain:Chain;
     protected store:KeyValStore;
+    protected wallet:Wallet;
 
     constructor(router:Router, chain:Chain){
         this.router = router;
         this.chain = chain;
+        this.wallet = new Wallet();
 
         this.store = this.chain.getKeyValStore();
     }
@@ -17,7 +20,7 @@ export abstract class BaseChainRoute {
     protected abstract create():void
 
     protected verifyUser(req:Request,cb:Function):void {
-        // check if user is logged in
+        // check if user is enrolled in
         if(typeof req.session['enrolledID'] !== 'undefined' && req.session['enrolledID'] !== null){
             // get user object from chain
             this.chain.getMember(req.session['enrolledID'],(err:Error, user:Member)=>{
@@ -42,7 +45,7 @@ export abstract class BaseChainRoute {
                 }
             });
         } else {
-            cb(new Error("Please login first"))
+            cb(new Error(req.session['enrolledID']+"Please enroll first!"))
         }
     }
 

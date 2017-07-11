@@ -1,0 +1,33 @@
+<div *ngIf="enrolledId">
+  <h4>Enrolled ID: {{enrolledId}}</h4>
+
+  <button type="button" class="btn btn-default" (click)="unenroll()">Unenroll</button>
+</div>
+<div *ngIf="!enrolledId">
+  <div class="alert" [ngClass]="msg.level" *ngIf="msg">
+    <strong>{{msg.text}}</strong>
+  </div>
+  <h4>Enroll</h4>
+  <div [ngClass]="(identities && identities.length > 0) ? 'col-sm-5' : 'col-sm-10'">
+    <div id="enroll">
+      <div class="form-group">
+        <label for="enrollId">Username</label>
+        <input type="text" class="form-control" id="enrollId" [(ngModel)]="enrollId">
+      </div>
+      <div class="form-group">
+        <label for="enrollSecret">Password</label>
+        <input type="password" class="form-control" id="enrollSecret" [(ngModel)]="enrollSecret">
+      </div>
+      <button type="button" class="btn btn-success" (click)="enroll(enrollId,enrollSecret)">Enroll new identity</button>
+    </div>
+  </div>
+  <div class="col-sm-5" *ngIf="identities && identities.length > 0">
+    <div class="form-group">
+      <label for="cb">My identities:</label>
+      <select id="cb" class="form-control" [(ngModel)]="selectedID">
+        <option *ngFor="let id of identities" [value]="id">{{id}}</option>
+      </select>
+    </div>
+    <button type="button" class="btn btn-success" (click)="enrollKnownID(selectedID)">Enroll</button>
+  </div>
+</div>
