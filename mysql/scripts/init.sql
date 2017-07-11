@@ -10,3 +10,9 @@ CREATE TABLE IF NOT EXISTS identities (
     PRIMARY KEY(user_id, identity),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+CREATE TABLE IF NOT EXISTS addresses {
+    user_id INT NOT NULL,
+    address varchar(255) NOT NULL,
+    PRIMARY KEY(user_id, address),
+    FOREIGN KEY(user_id) REFERENCES users(id)
+};

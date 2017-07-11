@@ -5,6 +5,7 @@ import { Message,CcRole } from '../../types';
 import { SharedService } from '../../services/shared.service';
 import { ChainService }   from '../../services/chain.service';
 import {Subscription} from "rxjs/Subscription";
+import {WalletService} from "../../services/wallet.service";
 
 @Component({
   moduleId: module.id,
@@ -13,12 +14,13 @@ import {Subscription} from "rxjs/Subscription";
 })
 export class EnrollComponent implements OnInit {
   private enrolledId:string;
+  private identities:string[];
   private ccid:string;
   private msg:Message;
   private role:CcRole;
   private subscription:Subscription;
 
-  constructor(private sharedService:SharedService, private chainService:ChainService) {};
+  constructor(private sharedService:SharedService, private chainService:ChainService, private walletService:WalletService) {};
 
   ngOnInit(): void {
     this.chainService.get_enrollment().then(result => {
@@ -30,6 +32,11 @@ export class EnrollComponent implements OnInit {
       } else {
         console.log("Currently not enrolled.");
       }
+    });
+
+    // get identities registerred to this user
+    this.walletService.getIdentities().then(result=>{
+      this.identities = result as string[];
     });
 
     this.subscription = this.sharedService.notifyObservable$.subscribe(result => {
@@ -75,6 +82,27 @@ export class EnrollComponent implements OnInit {
     }
   }
 
+  private enrollKnownID(enrollId:string):void {
+    console.log("enroll",enrollId);
+
+    if(typeof enrollId != "undefined"){
+      this.msg = { text: "Enrolling...", level:"alert-info"};
+      // enroll
+      this.chainService.enroll(enrollId,"").then((result:any) => {
+        this.msg = null;
+        console.log("Enrollment result:",result);
+        this.enrolledId = result;
+        this.sharedService.setKey("enrolledId",result);
+        this.sharedService.notifyOther({option: 'enroll',value: result});
+      }).catch(() => {
+        this.msg = { text: "Failed to enroll", level:"alert-danger"};
+      });
+    } else {
+      this.msg = { text: "Please select an identity", level:"alert-warning"};
+    }
+
+  }
+
   private unenroll():void {
     console.log("Unenroll");
 
@@ -85,6 +113,10 @@ export class EnrollComponent implements OnInit {
       this.sharedService.setKey("role",null);
       this.sharedService.notifyOther({option: 'enroll',value: null});
       this.sharedService.notifyOther({option: 'role',value: null});
+
+      this.walletService.getIdentities().then(result=>{
+        this.identities = result as string[];
+      });
     }).catch(() => {
       this.msg = { text: "Failed to unenroll", level:"alert-danger"};
     });

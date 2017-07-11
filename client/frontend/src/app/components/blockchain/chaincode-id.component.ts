@@ -42,8 +42,9 @@ export class ChaincodeIdComponent implements OnInit {
   update():void {
     if(this.newCcId != null){
       this.chainService.set_ccid(this.newCcId).then((result:string) => {
-        this.sharedService.notifyOther({option: 'ccid',value: result});
+        this.sharedService.notifyOther({option: 'ccid',value: this.newCcId});
         this.sharedService.setKey("chaincodeID",this.newCcId);
+        this.ccId = this.newCcId;
       });
     }
   }
