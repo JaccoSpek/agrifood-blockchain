@@ -8,6 +8,7 @@
     <tr>
       <th>UUID</th>
       <th>Producer</th>
+      <th>Amount</th>
       <th>Created</th>
       <th>AccreditationSignatures</th>
       <th>Ownership</th>
@@ -17,6 +18,7 @@
     <tr *ngFor="let grapeAsset of produced_grapeAssets">
       <td>{{grapeAsset.UUID}}</td>
       <td>{{grapeAsset.Producer}}</td>
+      <td>{{grapeAsset.Amount}} Kg.</td>
       <td>{{grapeAsset.Created}}</td>
       <td>
         <ul class="list-group" *ngIf="grapeAsset.AccreditationSignatures && grapeAsset.AccreditationSignatures.length > 0">

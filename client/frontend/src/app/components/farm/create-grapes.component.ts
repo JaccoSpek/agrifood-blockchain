@@ -10,6 +10,7 @@ import {ChainService} from "../../services/chain.service";
   templateUrl: 'create-grapes.component.html'
 })
 export class CreateGrapesComponent extends AppComponent {
+  private amount:number;
   private created_date:string;
   private msg:Message;
 
@@ -20,12 +21,13 @@ export class CreateGrapesComponent extends AppComponent {
   OnInitialized():void {
     let now:Date = new Date();
     this.created_date = now.toISOString();
+    this.amount = 100;
   }
 
-  createGrapes(uuid:string,timestamp:string):void {
+  createGrapes(uuid:string,timestamp:string,amount:number):void {
     console.log("create grapes");
     this.msg = {text:"Create grapes..",level:"alert-info"};
-    this.chainService.create_grapes(uuid,timestamp).then(result => {
+    this.chainService.create_grapes(uuid,timestamp,amount).then(result => {
       console.log(result);
       this.msg = {text:result,level:"alert-success"};
     }).catch(reason => {

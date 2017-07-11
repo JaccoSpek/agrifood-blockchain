@@ -266,12 +266,13 @@ export class ChainService {
       .catch(ChainService.handleError);
   }
 
-  create_grapes(uuid:string,timestamp:string):Promise<string> {
+  create_grapes(uuid:string,timestamp:string,amount:number):Promise<string> {
     let url = `${this.apiURL}/farm/create_grapes`;
 
     let args = {
       uuid:uuid,
-      timestamp:timestamp
+      timestamp:timestamp,
+      amount:amount.toString()
     };
 
     return this.http.post(url,args,this.opts)

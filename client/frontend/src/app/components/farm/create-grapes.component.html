@@ -8,10 +8,14 @@
     <input type="text" class="form-control" id="uuid" [(ngModel)]="uuid">
   </div>
   <div class="form-group">
+    <label for="amount">Amount (in KG):</label>
+    <input type="text" class="form-control" id="amount" [(ngModel)]="amount">
+  </div>
+  <div class="form-group">
     <label for="created_date">Created date:</label>
     <input type="text" class="form-control" id="created_date" [(ngModel)]="created_date">
   </div>
   <div class="form-group" *ngIf="uuid">
-    <button type="button" class="btn btn-success" (click)="createGrapes(uuid,created_date)">Create grape asset</button>
+    <button type="button" class="btn btn-success" (click)="createGrapes(uuid,created_date,amount)">Create grape asset</button>
   </div>
 </div>

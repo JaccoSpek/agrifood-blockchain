@@ -204,6 +204,7 @@ export class Wallet {
                 client.query('SELECT addresses.address FROM addresses,users WHERE users.id = addresses.user_id AND users.username=:username',{
                     username:username
                 },(err:Error,result:any[]) => {
+                    client.end();
                     if(err){
                         throw err;
                     } else {

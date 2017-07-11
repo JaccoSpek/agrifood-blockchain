@@ -45,6 +45,7 @@ export class OwnershipEntry {
 
 export class GrapeAsset {
   UUID:                     string;
+  Amount:                   number;
   Producer:                 string;
   Created:                  string;
   AccreditationSignatures:  AccreditationSignature[];

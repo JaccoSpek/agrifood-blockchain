@@ -8,6 +8,7 @@ import (
 	"github.com/hyperledger/fabric/core/crypto/primitives"
 	"encoding/json"
 	"time"
+	"strconv"
 )
 
 var myLogger = shim.NewLogger("Agrifood")
@@ -65,6 +66,7 @@ type GrapesUnit struct {
 	Producer                string
 	Created                 time.Time
 	UUID                    string
+	Amount			int
 	AccreditationSignatures []AccreditationSignature
 	Ownership               []OwnershipEntry
 }
@@ -692,8 +694,8 @@ func (t *AgrifoodChaincode) create_grapes(stub shim.ChaincodeStubInterface, args
 	}
 
 	// Check number of arguments
-	if len(args) != 2 {
-		msg := "Incorrect number of arguments. Expecting 2" // UUID, created
+	if len(args) != 3 {
+		msg := "Incorrect number of arguments. Expecting 3" // UUID, created, Amount
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
@@ -706,6 +708,14 @@ func (t *AgrifoodChaincode) create_grapes(stub shim.ChaincodeStubInterface, args
 		myLogger.Error(msg)
 		return nil, errors.New(msg)
 	}
+
+	amount, err := strconv.Atoi(args[2])
+	if err != nil {
+		msg := fmt.Sprintf("Error parsing amount: %s", err)
+		myLogger.Error(msg)
+		return nil, errors.New(msg)
+	}
+	grapesUnit.Amount = amount
 
 	// Add to ownership chain
 	ownershipEntry := OwnershipEntry{PartyID:party.ID,Timestamp:grapesUnit.Created}
