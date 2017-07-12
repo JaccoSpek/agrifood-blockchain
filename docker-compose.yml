@@ -68,7 +68,7 @@ services:
 
   # membership service
   membersrvc:
-    image: hyperledger/fabric-membersrvc
+    image: hyperledger/fabric-membersrvc:x86_64-0.6.1-preview
     ports:
       - "7054:7054"
     environment:
@@ -88,7 +88,7 @@ services:
     command: membersrvc
 
   vp0:
-    image: hyperledger/fabric-peer
+    image: hyperledger/fabric-peer:x86_64-0.6.1-preview
     ports:
       - "7050:7050"
       - "7051:7051"
