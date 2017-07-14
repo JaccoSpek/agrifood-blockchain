@@ -128,6 +128,7 @@ export class Wallet {
                 let client = new Mariadb(this.dbConfig);
 
                 client.query('SELECT users.username, identities.identity FROM identities,users WHERE users.id = identities.user_id',null,(err:Error,result:any[]) => {
+                    client.end();
                     if(err){
                         throw err;
                     } else {
@@ -149,6 +150,7 @@ export class Wallet {
                 client.query('SELECT identities.identity FROM identities,users WHERE users.id = identities.user_id AND users.username=:username',{
                     username:username
                 },(err:Error,result:any[]) => {
+                    client.end();
                     if(err){
                         throw err;
                     } else {
