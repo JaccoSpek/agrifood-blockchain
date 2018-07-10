@@ -1,3 +1,5 @@
+NB: This is an old PoC project which is no longer maintained, since it uses an old and depricated Hyperledger Fabric version (v0.6)
+
 To start the demo:
 1. The chaincode GO code needs to be vendored, first create the folder, and go there: `mkdir -p chaincode/agrifood/vendor/github.com/hyperledger && cd chaincode/agrifood/vendor/github.com/hyperledger`
 2. clone the hyperledger v0.6 branch: `git clone https://github.com/hyperledger/fabric.git -b v0.6`
